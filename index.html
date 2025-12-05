@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kalkulator Projek Madu Kelulut</title>
+  <title>KALKULATOR PROJEK MADU KELULUT</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 10px; }
     h1, h2 { text-align: center; }
-    .container { max-width: 700px; margin: auto; }
+    .container { max-width: 750px; margin: auto; }
     label { display: block; margin-top: 8px; font-size: 14px; }
     input { width: 100%; padding: 6px; box-sizing: border-box; font-size: 14px; }
     button { margin-top: 12px; width: 100%; padding: 10px; font-size: 15px; }
@@ -23,47 +23,89 @@
 <body>
 <div class="container">
   <h1>Kalkulator Projek Madu Kelulut</h1>
-  <h2>NPV, IRR, BCR, Harga Pulang Modal</h2>
+  <h2>Analisis Kewangan</h2>
 
   <p class="note">
-    Versi ini ikut struktur jadual aliran kewangan: maklumat ladang, pecahan kos (pembangunan, bahan input,
-    tenaga kerja, pelbagai), kos kontinjensi 10%, analisis NPV, IRR, Nisbah Faedah-Kos (BCR),
-    harga pulang modal (RM/kg) dan tempoh pulang modal. Harga & kos dianggap sama bagi setiap tahun.
+    Kalkulator ini menggunakan unit <strong>ekar</strong> (bukan hektar), dengan pecahan kos:
+    pembangunan, bahan input, tenaga kerja dan pelbagai (penyelenggaraan + utiliti).
+    Kos kontinjensi 10% ditambah ke atas jumlah kos untuk setiap tahun.
   </p>
 
+  <!-- A. Maklumat Ladang -->
   <div class="section-title">A. Maklumat Ladang</div>
-  <label>Keluasan (hektar):
-    <input id="areaHa" type="number" value="2">
+  <label>Keluasan (ekar):
+    <input id="areaAcre" type="number" value="5">
   </label>
-  <label>Kepadatan koloni (koloni/ha):
-    <input id="density" type="number" value="100">
+  <label>Kepadatan koloni (koloni/ekar):
+    <input id="density" type="number" value="50">
   </label>
   <label>Hasil madu per koloni setahun (kg/koloni/tahun):
     <input id="yieldPerColony" type="number" value="2.5">
   </label>
 
+  <!-- B. Hasil Projek -->
   <div class="section-title">B. Hasil Projek</div>
   <label>Harga Jual Madu (RM/kg):
     <input id="price" type="number" value="200">
   </label>
 
-  <div class="section-title">C. Kos Projek</div>
-  <label>Kos Pembangunan (Tahun 0 sahaja) – contoh: koloni, pagar, infrastruktur (RM):
-    <input id="devCost0" type="number" value="297000">
+  <!-- C. Kos Pembangunan (Tahun 0) -->
+  <div class="section-title">C. Kos Pembangunan (Tahun 0)</div>
+  <label>Pembersihan kawasan (RM/ekar, sekali – tahun 0):
+    <input id="clearCostPerAcre" type="number" value="2500">
+  </label>
+  <label>Pembinaan pagar (RM/ekar, sekali – tahun 0):
+    <input id="fenceCostPerAcre" type="number" value="3000">
   </label>
 
-  <label>Kos Bahan Input Tahunan – contoh: makanan, kawalan serangga, input pertanian (RM/tahun):
-    <input id="inputCostAnnual" type="number" value="20000">
+  <!-- D. Kos Bahan Input -->
+  <div class="section-title">D. Kos Bahan Input</div>
+  <label>Pembinaan koloni kelulut (kotak koloni + kotak topping)
+    (RM/koloni, sekali – tahun 0):
+    <input id="colonySetupCostPerColony" type="number" value="1000">
+  </label>
+  <label>Bilangan alat penyedut madu bermotor (unit – tahun 0):
+    <input id="numExtractors" type="number" value="2">
+  </label>
+  <label>Kos satu alat penyedut madu bermotor (RM/unit):
+    <input id="extractorUnitCost" type="number" value="200">
+  </label>
+  <label>Bilangan bekas simpanan madu (5kg):
+    <input id="numContainers" type="number" value="10">
+  </label>
+  <label>Kos satu bekas simpanan madu 5kg (RM/unit):
+    <input id="containerUnitCost" type="number" value="50">
+  </label>
+  <label>Kos kawalan serangga (RM/setahun):
+    <input id="insectControlAnnual" type="number" value="200">
   </label>
 
-  <label>Kos Tenaga Kerja Tahunan (RM/tahun):
+  <!-- E. Kos Tenaga Kerja -->
+  <div class="section-title">E. Kos Tenaga Kerja</div>
+  <label>Kos tenaga kerja (RM/setahun):
     <input id="labourCostAnnual" type="number" value="28800">
   </label>
 
-  <label>Kos Pelbagai Tahunan – contoh: penyelenggaraan, sewa tanah, lain-lain (RM/tahun):
-    <input id="miscCostAnnual" type="number" value="16000">
+  <!-- F. Kos Pelbagai (Penyelenggaraan & Utiliti) -->
+  <div class="section-title">F. Kos Pelbagai</div>
+  <label>Penyelenggaraan pagar (RM/ekar setiap 3 tahun)
+    – contoh: RM500/ekar setiap 3 tahun:
+    <input id="fenceMaintPerAcre" type="number" value="500">
+  </label>
+  <label>Penyelenggaraan / alat ganti alat penyedut madu bermotor
+    (RM/setahun – kecil, contoh RM100 setahun):
+    <input id="extractorMaintAnnual" type="number" value="100">
+  </label>
+  <label>Penggantian kotak koloni + kotak topping
+    (RM/koloni setiap 2 tahun – contoh RM100/koloni):
+    <input id="colonyReplacementCostPerColony" type="number" value="100">
+  </label>
+  <label>Sewa tanah (RM/ekar setahun – kos utiliti):
+    <input id="landRentPerAcreAnnual" type="number" value="500">
   </label>
 
+  <!-- G. Parameter Analisis -->
+  <div class="section-title">G. Parameter Analisis</div>
   <label>Kadar Diskaun (% setahun):
     <input id="discountRate" type="number" value="10">
   </label>
@@ -73,16 +115,20 @@
   </label>
 
   <p class="note">
-    Kos kontinjensi 10% akan dikira secara automatik atas jumlah kos setiap tahun
-    (pembangunan + bahan input + tenaga kerja + pelbagai).
+    Kos tahunan untuk penyelenggaraan pagar (3 tahun sekali) dan penggantian kotak (2 tahun sekali)
+    akan ditukar kepada kos tahunan purata (dibahagi 3 atau 2) supaya pengiraan lebih mudah.
+    Kos kontinjensi 10% akan ditambah atas jumlah kos setiap tahun.
   </p>
 
   <button onclick="runAnalysis()">Kira Analisis</button>
 
   <div id="results" class="summary"></div>
 
-  <div class="section-title">D. Graf Visual</div>
-  <p class="note">Graf ini membantu penternak melihat aliran tunai, pulang modal, dan kesan perubahan harga.</p>
+  <div class="section-title">H. Graf Visual</div>
+  <p class="note">
+    Graf membantu penternak melihat aliran tunai, bila pulang modal,
+    dan kesan perubahan harga madu.
+  </p>
   <canvas id="cfChart" height="180"></canvas>
   <canvas id="cumCfChart" height="180"></canvas>
   <canvas id="npvSensChart" height="180"></canvas>
@@ -125,11 +171,11 @@
     return rate;
   }
 
-  function computeScenario(T, areaHa, density, yieldPerColony, basePrice,
+  // Kira senario satu harga
+  function computeScenario(T, areaAcre, density, yieldPerColony, basePrice,
                            devCost0, inputAnnual, labourAnnual, miscAnnual,
-                           discountRate, priceFactor) {
+                           discountRate, priceFactor, colonies) {
 
-    const colonies = areaHa * density;
     const price = basePrice * priceFactor;
     const totalKgPerYear = colonies * yieldPerColony;
 
@@ -190,10 +236,11 @@
     };
   }
 
-  function computeBreakEvenPrice(T, areaHa, density, yieldPerColony,
+  // Harga pulang modal (RM/kg) – NPV = 0 (anggaran linear)
+  function computeBreakEvenPrice(T, areaAcre, density, yieldPerColony,
                                  devCost0, inputAnnual, labourAnnual, miscAnnual,
-                                 discountRate) {
-    const colonies = areaHa * density;
+                                 discountRate, colonies) {
+
     const totalKgPerYear = colonies * yieldPerColony;
 
     let pvKg = 0;
@@ -222,37 +269,82 @@
   }
 
   function runAnalysis() {
-    const areaHa         = parseFloat(document.getElementById('areaHa').value);
-    const density        = parseFloat(document.getElementById('density').value);
-    const yieldPerColony = parseFloat(document.getElementById('yieldPerColony').value);
-    const basePrice      = parseFloat(document.getElementById('price').value);
-    const devCost0       = parseFloat(document.getElementById('devCost0').value);
-    const inputAnnual    = parseFloat(document.getElementById('inputCostAnnual').value);
-    const labourAnnual   = parseFloat(document.getElementById('labourCostAnnual').value);
-    const miscAnnual     = parseFloat(document.getElementById('miscCostAnnual').value);
-    const r              = parseFloat(document.getElementById('discountRate').value) / 100;
-    const T              = parseInt(document.getElementById('duration').value);
+    const areaAcre      = parseFloat(document.getElementById('areaAcre').value);
+    const density       = parseFloat(document.getElementById('density').value);
+    const yieldPerCol   = parseFloat(document.getElementById('yieldPerColony').value);
+    const basePrice     = parseFloat(document.getElementById('price').value);
 
-    if ([areaHa, density, yieldPerColony, basePrice, devCost0, inputAnnual,
-         labourAnnual, miscAnnual, r, T].some(v => isNaN(v))) {
+    const clearCostPerAcre  = parseFloat(document.getElementById('clearCostPerAcre').value);
+    const fenceCostPerAcre  = parseFloat(document.getElementById('fenceCostPerAcre').value);
+
+    const colonySetupCostPerColony = parseFloat(document.getElementById('colonySetupCostPerColony').value);
+    const numExtractors            = parseFloat(document.getElementById('numExtractors').value);
+    const extractorUnitCost        = parseFloat(document.getElementById('extractorUnitCost').value);
+    const numContainers            = parseFloat(document.getElementById('numContainers').value);
+    const containerUnitCost        = parseFloat(document.getElementById('containerUnitCost').value);
+    const insectControlAnnual      = parseFloat(document.getElementById('insectControlAnnual').value);
+
+    const labourAnnual             = parseFloat(document.getElementById('labourCostAnnual').value);
+
+    const fenceMaintPerAcre        = parseFloat(document.getElementById('fenceMaintPerAcre').value);
+    const extractorMaintAnnual     = parseFloat(document.getElementById('extractorMaintAnnual').value);
+    const colonyReplaceCostPerCol  = parseFloat(document.getElementById('colonyReplacementCostPerColony').value);
+    const landRentPerAcreAnnual    = parseFloat(document.getElementById('landRentPerAcreAnnual').value);
+
+    const rPercent = parseFloat(document.getElementById('discountRate').value);
+    const T        = parseInt(document.getElementById('duration').value);
+
+    if ([areaAcre, density, yieldPerCol, basePrice,
+         clearCostPerAcre, fenceCostPerAcre, colonySetupCostPerColony,
+         numExtractors, extractorUnitCost, numContainers, containerUnitCost,
+         insectControlAnnual, labourAnnual, fenceMaintPerAcre,
+         extractorMaintAnnual, colonyReplaceCostPerCol, landRentPerAcreAnnual,
+         rPercent, T].some(v => isNaN(v))) {
       alert("Sila pastikan semua input diisi dengan nombor yang sah.");
       return;
     }
 
+    const r = rPercent / 100;
+
+    // Bilangan koloni dan hasil
+    const colonies = areaAcre * density;
+    const totalKgPerYear = colonies * yieldPerCol;
+
+    // KOS PEMBANGUNAN (tahun 0)
+    const devCostClearing = areaAcre * clearCostPerAcre;
+    const devCostFence    = areaAcre * fenceCostPerAcre;
+    const devCostColonies = colonies * colonySetupCostPerColony;
+    const devCostExtract  = numExtractors * extractorUnitCost;
+    const devCostCont     = numContainers * containerUnitCost;
+
+    const devCost0 = devCostClearing + devCostFence + devCostColonies +
+                     devCostExtract + devCostCont;
+
+    // KOS TAHUNAN PURATA UNTUK BAHAN INPUT & PENYELENGGARAAN
+    const annualFenceMaintEq    = areaAcre * fenceMaintPerAcre / 3;          // 3 tahun sekali
+    const annualColonyReplaceEq = colonies * colonyReplaceCostPerCol / 2;    // 2 tahun sekali
+    const annualExtractorMaint  = extractorMaintAnnual;                      // tiap tahun
+    const annualInsect          = insectControlAnnual;                       // tiap tahun
+
+    const inputAnnual = annualFenceMaintEq + annualColonyReplaceEq +
+                        annualExtractorMaint + annualInsect;
+
+    // KOS TENAGA KERJA & UTILITI (SEWA TANAH)
+    const miscAnnual   = areaAcre * landRentPerAcreAnnual;
+    const labourAnnualCost = labourAnnual;
+
     const factors = [0.8, 0.9, 1.0, 1.1, 1.2];
 
     const baseScenario = computeScenario(
-      T, areaHa, density, yieldPerColony, basePrice,
-      devCost0, inputAnnual, labourAnnual, miscAnnual, r, 1.0
+      T, areaAcre, density, yieldPerCol, basePrice,
+      devCost0, inputAnnual, labourAnnualCost, miscAnnual, r, 1.0, colonies
     );
 
     const breakEvenPrice = computeBreakEvenPrice(
-      T, areaHa, density, yieldPerColony,
-      devCost0, inputAnnual, labourAnnual, miscAnnual, r
+      T, areaAcre, density, yieldPerCol,
+      devCost0, inputAnnual, labourAnnualCost, miscAnnual, r, colonies
     );
 
-    const colonies = baseScenario.colonies;
-    const totalKgPerYear = baseScenario.totalKgPerYear;
     const paybackText = baseScenario.paybackYear
       ? "Tahun ke-" + baseScenario.paybackYear
       : "Tidak pulang modal dalam tempoh analisis";
@@ -279,8 +371,8 @@
 
     factors.forEach((f, idx) => {
       const sc = computeScenario(
-        T, areaHa, density, yieldPerColony, basePrice,
-        devCost0, inputAnnual, labourAnnual, miscAnnual, r, f
+        T, areaAcre, density, yieldPerCol, basePrice,
+        devCost0, inputAnnual, labourAnnualCost, miscAnnual, r, f, colonies
       );
       sensLabels.push((f * 100).toFixed(0) + "%");
       sensNPV.push(sc.npv);
@@ -299,20 +391,42 @@
 
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML =
-      `<p><strong>Keluasan:</strong> ${areaHa.toFixed(2)} ha</p>
-       <p><strong>Kepadatan koloni:</strong> ${density.toFixed(0)} koloni/ha
+      `<p><strong>Keluasan:</strong> ${areaAcre.toFixed(2)} ekar</p>
+       <p><strong>Kepadatan koloni:</strong> ${density.toFixed(0)} koloni/ekar
           &nbsp;→&nbsp; <strong>Bilangan koloni:</strong> ${colonies.toFixed(0)} koloni</p>
        <p><strong>Jumlah hasil madu setahun:</strong> ${totalKgPerYear.toFixed(2)} kg/tahun</p>
+       <p><strong>Jumlah kos pembangunan (tahun 0):</strong> RM ${devCost0.toFixed(2)}</p>
+       <p><strong>Kos bahan input tahunan setara:</strong> RM ${inputAnnual.toFixed(2)} / tahun</p>
+       <p><strong>Kos tenaga kerja tahunan:</strong> RM ${labourAnnualCost.toFixed(2)} / tahun</p>
+       <p><strong>Kos pelbagai & utiliti (sewa tanah) tahunan:</strong> RM ${miscAnnual.toFixed(2)} / tahun</p>
+       <hr>
        <p><strong>NPV (Nilai Kini Bersih):</strong> RM ${baseScenario.npv.toFixed(2)}</p>
        <p><strong>IRR (Kadar Pulangan Dalaman):</strong> ${baseScenario.irr.toFixed(2)} %</p>
        <p><strong>BCR (Nisbah Faedah-Kos):</strong> ${baseScenario.bcr !== null ? baseScenario.bcr.toFixed(2) : "-"}</p>
        <p><strong>Harga Pulang Modal (RM/kg):</strong> ${breakEvenPrice !== null ? breakEvenPrice.toFixed(2) : "-"}</p>
        <p><strong>Tempoh Pulang Modal:</strong> ${paybackText}</p>
+       <div class="note">
+         <strong>Takrif ringkas untuk penternak:</strong>
+         <ul>
+           <li><strong>NPV &gt; 0</strong> &rarr; projek beri lebihan wang selepas tolak semua kos
+             dan ambil kira nilai masa wang. Lebih besar NPV, lebih baik.</li>
+           <li><strong>IRR</strong> ialah purata kadar pulangan setahun. Jika
+             IRR <strong>lebih tinggi</strong> daripada kadar diskaun (contoh 10%), projek dianggap
+             menarik.</li>
+           <li><strong>BCR &gt; 1</strong> bermaksud jumlah faedah (hasil) lebih besar daripada
+             jumlah kos. Jika BCR &lt; 1, projek kurang berbaloi.</li>
+           <li><strong>Harga pulang modal</strong> ialah harga minimum madu (RM/kg) yang perlu
+             dicapai supaya projek <strong>tidak rugi</strong> (NPV = 0).</li>
+           <li><strong>Tempoh pulang modal</strong> ialah tahun bila jumlah aliran tunai terkumpul
+             mula menjadi positif – selepas tahun itu, projek mula betul-betul
+             memberi lebihan.</li>
+         </ul>
+       </div>
        ${table}
        ${sensTable}
        <p class="note">
          Nota: Kos kontinjensi 10% telah ditambah secara automatik pada setiap tahun
-         atas jumlah kos langsung (pembangunan/bahan input/tenaga kerja/pelbagai).
+         atas jumlah kos langsung (pembangunan, bahan input, tenaga kerja dan pelbagai).
        </p>`;
 
     // ---------------- GRAF 1: Aliran Tunai Bersih ----------------
