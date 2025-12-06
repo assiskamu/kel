@@ -173,7 +173,13 @@
   <h2>Analisis Kewangan</h2>
 
   <p class="note">
-    Kalkulator ini membantu penternak menilai sama ada projek madu kelulut berbaloi atau tidak dari sudut kewangan.
+    Hai semua! Kalkulator ini membantu penternak menilai sama ada projek madu kelulut berbaloi atau tidak dari sudut kewangan.
+  </p>
+  <p class="note">
+    <strong>Arahan:</strong> Sila isi <strong>Maklumat Penternak</strong> dan semua bahagian
+    <strong>A hingga G</strong> di bawah mengikut keadaan projek sebenar,
+    kemudian tekan butang <strong>"Kira Analisis"</strong>. Nilai boleh diubah bila-bila masa
+    untuk melihat kesan terhadap NPV (Nilai Kini Bersih), IRR (Kadar Pulangan Dalaman) dan lain-lain.
   </p>
 
   <!-- Maklumat Penternak -->
@@ -340,6 +346,14 @@
     const parts = x.toFixed(decimals).split(".");
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return parts.join(".");
+  }
+
+  // Format dengan warna – merah jika negatif
+  function coloredFmt(x, decimals = 2) {
+    if (x === null || isNaN(x)) return "-";
+    const formatted = fmt(x, decimals);
+    const color = x < 0 ? '#ff5252' : '#f1f1f1';
+    return `<span style="color:${color};">${formatted}</span>`;
   }
 
   function npv(rate, cashflows) {
@@ -568,7 +582,7 @@
         </tr>
         <tr>
           <td style="text-align:left;">NPV (Nilai Kini Bersih)</td>
-          <td>RM ${fmt(npvVal)}</td>
+          <td>RM ${coloredFmt(npvVal)}</td>
           <td style="text-align:left;">
             Lebihan wang projek selepas tolak semua kos dan ambil kira nilai masa wang.
             Jika NPV &gt; 0, projek biasanya dianggap menguntungkan.
@@ -576,7 +590,7 @@
         </tr>
         <tr>
           <td style="text-align:left;">IRR (Kadar Pulangan Dalaman)</td>
-          <td>${fmt(irrVal)} %</td>
+          <td>${coloredFmt(irrVal)} %</td>
           <td style="text-align:left;">
             Purata kadar pulangan setahun. Jika IRR lebih tinggi daripada kadar diskaun
             (contoh 3–10%), projek dianggap menarik.
@@ -592,7 +606,7 @@
         </tr>
         <tr>
           <td style="text-align:left;">ROI (Pulangan atas Pelaburan)</td>
-          <td>${roiVal !== null ? fmt(roiVal) : "-"} %</td>
+          <td>${roiVal !== null ? coloredFmt(roiVal) : "-"} %</td>
           <td style="text-align:left;">
             Pulangan kasar berbanding jumlah kos. Contoh ROI = 30% bermaksud setiap RM1 kos
             menghasilkan lebih kurang 30 sen keuntungan sepanjang projek.
@@ -688,9 +702,9 @@
     for (let t = 0; t <= T; t++) {
       table += `<tr>
         <td style="text-align:center">${t}</td>
-        <td>${fmt(baseScenario.benefits[t])}</td>
-        <td>${fmt(baseScenario.totalCosts[t])}</td>
-        <td>${fmt(baseScenario.cashflows[t])}</td>
+        <td>${coloredFmt(baseScenario.benefits[t])}</td>
+        <td>${coloredFmt(baseScenario.totalCosts[t])}</td>
+        <td>${coloredFmt(baseScenario.cashflows[t])}</td>
       </tr>`;
     }
     table += "</table>";
@@ -716,8 +730,8 @@
         <td style="text-align:center">${idx + 1}</td>
         <td>${(f * 100).toFixed(0)}%</td>
         <td>${fmt(sc.price)}</td>
-        <td>${fmt(sc.npv)}</td>
-        <td>${sc.irr.toFixed(2)}</td>
+        <td>${coloredFmt(sc.npv)}</td>
+        <td>${coloredFmt(sc.irr)}</td>
         <td>${sc.bcr !== null ? sc.bcr.toFixed(2) : "-"}</td>
       </tr>`;
     });
@@ -746,6 +760,14 @@
       cumData.push(cum);
     }
 
+    // Warna bar: merah untuk negatif, emas untuk positif
+    const cfColors = cfData.map(v =>
+      v < 0 ? 'rgba(255, 82, 82, 0.9)' : 'rgba(255, 202, 40, 0.7)'
+    );
+    const cfBorderColors = cfData.map(v =>
+      v < 0 ? 'rgba(255, 82, 82, 1)' : 'rgba(255, 202, 40, 1)'
+    );
+
     if (cfChartInstance) cfChartInstance.destroy();
     const cfCtx = document.getElementById('cfChart').getContext('2d');
     cfChartInstance = new Chart(cfCtx, {
@@ -755,8 +777,8 @@
         datasets: [{
           label: 'Aliran Tunai Bersih (RM)',
           data: cfData,
-          backgroundColor: 'rgba(255, 202, 40, 0.5)',
-          borderColor: 'rgba(255, 202, 40, 1)',
+          backgroundColor: cfColors,
+          borderColor: cfBorderColors,
           borderWidth: 1
         }]
       },
@@ -768,6 +790,10 @@
     });
 
     // GRAF 2: Aliran Tunai Terkumpul
+    const cumNegative = cumData[cumData.length - 1] < 0;
+    const cumLineColor = cumNegative ? 'rgba(255, 82, 82, 1)' : 'rgba(129, 199, 132, 1)';
+    const cumFillColor = cumNegative ? 'rgba(255, 82, 82, 0.3)' : 'rgba(129, 199, 132, 0.3)';
+
     if (cumCfChartInstance) cumCfChartInstance.destroy();
     const cumCtx = document.getElementById('cumCfChart').getContext('2d');
     cumCfChartInstance = new Chart(cumCtx, {
@@ -778,8 +804,8 @@
           label: 'Aliran Tunai Terkumpul (RM)',
           data: cumData,
           fill: false,
-          borderColor: 'rgba(129, 199, 132, 1)',
-          backgroundColor: 'rgba(129, 199, 132, 0.3)',
+          borderColor: cumLineColor,
+          backgroundColor: cumFillColor,
           tension: 0.2,
           borderWidth: 2
         }]
@@ -792,6 +818,13 @@
     });
 
     // GRAF 3: NPV vs Faktor Harga
+    const npvBarColors = sensNPV.map(v =>
+      v < 0 ? 'rgba(255, 82, 82, 0.9)' : 'rgba(255, 213, 79, 0.7)'
+    );
+    const npvBorderColors = sensNPV.map(v =>
+      v < 0 ? 'rgba(255, 82, 82, 1)' : 'rgba(255, 213, 79, 1)'
+    );
+
     if (npvSensChartInstance) npvSensChartInstance.destroy();
     const npvCtx = document.getElementById('npvSensChart').getContext('2d');
     npvSensChartInstance = new Chart(npvCtx, {
@@ -801,20 +834,8 @@
         datasets: [{
           label: 'NPV mengikut Senario Harga (RM)',
           data: sensNPV,
-          backgroundColor: [
-            'rgba(239, 83, 80, 0.7)',
-            'rgba(255, 183, 77, 0.7)',
-            'rgba(255, 241, 118, 0.7)',
-            'rgba(129, 199, 132, 0.7)',
-            'rgba(255, 213, 79, 0.7)'
-          ],
-          borderColor: [
-            'rgba(239, 83, 80, 1)',
-            'rgba(255, 183, 77, 1)',
-            'rgba(255, 241, 118, 1)',
-            'rgba(129, 199, 132, 1)',
-            'rgba(255, 213, 79, 1)'
-          ],
+          backgroundColor: npvBarColors,
+          borderColor: npvBorderColors,
           borderWidth: 1
         }]
       },
@@ -829,7 +850,7 @@
     resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // Fungsi Muat Turun PDF dengan watermark "Analisis Kewangan"
+  // Fungsi Muat Turun PDF (tanpa watermark sekarang)
   function downloadPDF() {
     const report = document.getElementById('reportArea');
     if (!report) return;
@@ -850,11 +871,6 @@
 
       // Halaman pertama
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      pdf.setFontSize(32);
-      pdf.setTextColor(180, 180, 180);
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Analisis Anggaran", pdfWidth / 2, pdfHeight / 2, { align: "center" });
-
       heightLeft -= pdfHeight;
 
       // Halaman seterusnya jika perlu
@@ -862,10 +878,6 @@
         position = heightLeft - imgHeight;
         pdf.addPage();
         pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        pdf.setFontSize(32);
-        pdf.setTextColor(180, 180, 180);
-        pdf.setFont("helvetica", "bold");
-        pdf.text("Analisis Anggaran", pdfWidth / 2, pdfHeight / 2, { align: "center" });
         heightLeft -= pdfHeight;
       }
 
