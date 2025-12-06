@@ -7,54 +7,75 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 10px;
-      background: #f5f7fb;
-      color: #222;
+      margin: 0;
+      padding: 16px;
+      background: radial-gradient(circle at top left, #3d2b1f 0, #0b0b0b 45%, #000000 100%);
+      color: #f4f4f4;
     }
     h1 {
       text-align: center;
-      color: #0056b3;
+      color: #ffd54f;
       margin-bottom: 4px;
+      letter-spacing: 1px;
     }
     h2 {
       text-align: center;
-      color: #0069d9;
+      color: #ffca28;
       margin-top: 0;
+      font-weight: normal;
     }
     .container {
-      max-width: 750px;
+      max-width: 820px;
       margin: auto;
-      background: #ffffff;
-      padding: 12px 14px 18px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      background: linear-gradient(135deg, #111111 0%, #181818 60%, #121212 100%);
+      padding: 16px 18px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.8);
+      border: 1px solid rgba(255, 215, 128, 0.6);
     }
     label {
       display: block;
       margin-top: 8px;
       font-size: 14px;
+      color: #f1f1f1;
     }
     input {
       width: 100%;
       padding: 6px;
       box-sizing: border-box;
       font-size: 14px;
-      border: 1px solid #cbd2e0;
       border-radius: 4px;
+      border: 1px solid #444;
+      background: #1e1e1e;
+      color: #f4f4f4;
+    }
+    input::placeholder {
+      color: #888;
     }
     button {
-      margin-top: 12px;
+      margin-top: 10px;
       width: 100%;
       padding: 10px;
       font-size: 15px;
-      background: #007bff;
-      color: #fff;
       border: none;
       border-radius: 4px;
-    }
-    button:hover {
-      background: #0056b3;
       cursor: pointer;
+    }
+    .btn-primary {
+      background: linear-gradient(90deg, #ffca28, #ffa000);
+      color: #222;
+      font-weight: bold;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(90deg, #ffb300, #ff8f00);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: #ffca28;
+      border: 1px solid #ffca28;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 202, 40, 0.12);
     }
     table {
       width: 100%;
@@ -63,39 +84,47 @@
       font-size: 12px;
     }
     th, td {
-      border: 1px solid #d0d7e6;
+      border: 1px solid #444;
       padding: 4px;
       text-align: right;
     }
     th {
-      background: #e6eefc;
+      background: #2b2418;
+      color: #ffecb3;
+    }
+    td {
+      background: #171717;
+      color: #f1f1f1;
     }
     .summary p {
       margin: 4px 0;
     }
     .note {
       font-size: 11px;
-      color: #555;
+      color: #c0c0c0;
       margin-top: 6px;
     }
     .section-title {
       margin-top: 15px;
       font-weight: bold;
-      color: #0056b3;
-      border-bottom: 2px solid #d0e2ff;
+      color: #ffca28;
+      border-bottom: 2px solid rgba(255, 213, 79, 0.4);
       padding-bottom: 2px;
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 0.5px;
     }
     canvas {
       margin-top: 10px;
-      background: #ffffff;
+      background: #111111;
       border-radius: 4px;
-      border: 1px solid #e0e4f0;
+      border: 1px solid #333;
     }
     .result-box {
-      background: #e9f5ff;
-      border-left: 4px solid #007bff;
+      background: rgba(33, 33, 33, 0.9);
+      border-left: 4px solid #ffca28;
       padding: 8px 10px;
-      margin-top: 10px;
+      margin-top: 12px;
       border-radius: 4px;
     }
     .conclusion-box {
@@ -104,44 +133,53 @@
       border-radius: 4px;
       border-left: 4px solid #999;
       font-size: 13px;
+      background: #191919;
     }
     .conclusion-good {
-      background: #e6ffed;
-      border-left-color: #28a745;
+      background: #16331e;
+      border-left-color: #66bb6a;
     }
     .conclusion-moderate {
-      background: #fff9e6;
-      border-left-color: #ff9800;
+      background: #372b16;
+      border-left-color: #ffb74d;
     }
     .conclusion-bad {
-      background: #ffe6e6;
-      border-left-color: #e53935;
+      background: #3a1616;
+      border-left-color: #ef5350;
     }
     .conclusion-title {
       font-weight: bold;
       font-size: 15px;
       margin-bottom: 4px;
     }
+    .disclaimer {
+      background: transparent;
+      border-top: 1px dashed rgba(255, 255, 255, 0.12);
+      margin-top: 18px;
+      padding-top: 10px;
+    }
   </style>
 </head>
 <body>
-<div class="container">
+<div class="container" id="reportArea">
   <h1>KALKULATOR PROJEK MADU KELULUT</h1>
   <h2>Analisis Kewangan</h2>
 
   <p class="note">
-    Hai semua! Kalkulator ini menggunakan unit <strong>ekar</strong> dan memecahkan kos kepada:
-    pembangunan, bahan input, tenaga kerja dan pelbagai (penyelenggaraan & utiliti).
-    Kos kontinjensi 10% ditambah secara automatik setiap tahun.
-    <br><br>
-    <strong>Cara guna ringkas:</strong>
-    <ol>
-      <li>Isi keluasan, kepadatan koloni dan hasil madu per koloni setahun.</li>
-      <li>Isi harga jual madu dan anggaran kos (boleh guna nilai cadangan atau ubah ikut keadaan sendiri).</li>
-      <li>Tekan <strong>Kira Analisis</strong>.</li>
-      <li>Semak jadual penunjuk kewangan, kesimpulan dan graf-graf di bawah.</li>
-    </ol>
+    Kalkulator ini membantu penternak menilai sama ada projek madu kelulut berbaloi atau tidak dari sudut kewangan.
   </p>
+
+  <!-- Maklumat Penternak -->
+  <div class="section-title">Maklumat Penternak</div>
+  <label>Nama penternak:
+    <input id="farmerName" type="text" placeholder="Contoh: Ali bin Ahmad">
+  </label>
+  <label>Nama kampung / lokasi:
+    <input id="villageName" type="text" placeholder="Contoh: Kg. Kilimu, Ranau">
+  </label>
+  <label>No. telefon:
+    <input id="phoneNumber" type="text" placeholder="Contoh: 012-3456789">
+  </label>
 
   <!-- A. Maklumat Ladang -->
   <div class="section-title">A. Maklumat Ladang</div>
@@ -170,7 +208,7 @@
     <input id="fenceCostPerAcre" type="number" value="1000">
   </label>
   <label>Pembinaan koloni kelulut (kotak + topping) (RM/koloni, tahun 0):
-    <input id="colonySetupCostPerColony" type="number" value="100">
+    <input id="colonySetupCostPerColony" type="number" value="1000">
   </label>
   <label>Bilangan alat penyedut madu bermotor (unit – tahun 0):
     <input id="numExtractors" type="number" value="1">
@@ -227,7 +265,8 @@
     ditambah atas jumlah kos setiap tahun.
   </p>
 
-  <button onclick="runAnalysis()">Kira Analisis</button>
+  <button class="btn-primary" onclick="runAnalysis()">Kira Analisis</button>
+  <button class="btn-secondary" onclick="downloadPDF()">Muat Turun PDF (Laporan)</button>
 
   <div id="results" class="summary"></div>
 
@@ -241,34 +280,42 @@
   <canvas id="npvSensChart" height="180"></canvas>
 
   <!-- DISCLAIMER & COPYRIGHT -->
-  <p class="note" style="margin-top:20px; font-size:10px; color:#777; line-height:1.4;">
-    <strong>Penafian (Disclaimer) – Bahasa Melayu:</strong><br>
-    Kalkulator ini disediakan untuk tujuan pembelajaran dan anggaran kasar sahaja.
-    Nilai kos, hasil dan pulangan sebenar mungkin berbeza mengikut lokasi, keadaan ternakan,
-    kemahiran pengurusan, harga pasaran serta faktor-faktor lain di luar kawalan pengeluar.
-    Pengguna dinasihatkan mendapatkan nasihat lanjut daripada pegawai atau pakar berkaitan
-    sebelum membuat keputusan pelaburan. Penyedia kalkulator tidak bertanggungjawab
-    terhadap sebarang kerugian, kerosakan atau tuntutan yang timbul daripada penggunaan
-    kalkulator ini.
-  </p>
+  <div class="disclaimer">
+    <p class="note" style="font-size:10px; color:#bbbbbb; line-height:1.4;">
+      <strong>Penafian (Disclaimer) – Bahasa Melayu:</strong><br>
+      Kalkulator ini disediakan untuk tujuan pembelajaran dan anggaran kasar sahaja.
+      Nilai kos, hasil dan pulangan sebenar mungkin berbeza mengikut lokasi, keadaan ternakan,
+      kemahiran pengurusan, harga pasaran serta faktor-faktor lain di luar kawalan pengeluar.
+      Pengguna dinasihatkan mendapatkan nasihat lanjut daripada pegawai atau pakar berkaitan
+      sebelum membuat keputusan pelaburan. Penyedia kalkulator tidak bertanggungjawab
+      terhadap sebarang kerugian, kerosakan atau tuntutan yang timbul daripada penggunaan
+      kalkulator ini.
+    </p>
 
-  <p class="note" style="margin-top:10px; font-size:10px; color:#777; line-height:1.4;">
-    <strong>Disclaimer – English Version:</strong><br>
-    This calculator is intended for educational use and approximate estimation only.
-    Actual costs, yields, and financial returns may vary depending on location, farm conditions,
-    management practices, market prices, and other external factors. Users are advised
-    to consult relevant officers or experts before making financial or investment decisions.
-    The creator of this calculator shall not be held responsible for any loss, damage,
-    or claims arising from its use.
-  </p>
+    <p class="note" style="font-size:10px; color:#bbbbbb; line-height:1.4;">
+      <strong>Disclaimer – English Version:</strong><br>
+      This calculator is intended for educational use and approximate estimation only.
+      Actual costs, yields, and financial returns may vary depending on location, farm conditions,
+      management practices, market prices, and external factors. Users are advised
+      to consult relevant officers or experts before making financial or investment decisions.
+      The creator of this calculator shall not be held responsible for any loss, damage,
+      or claims arising from its use.
+    </p>
 
-  <p class="note" style="margin-top:10px; font-size:10px; color:#777; text-align:center;">
-    &copy; 2025 Assis Kamu, Universiti Malaysia Sabah. All Rights Reserved.
-  </p>
+    <p class="note" style="font-size:10px; color:#999999; text-align:center;">
+      &copy; 2025 Assis Kamu, Universiti Malaysia Sabah. All Rights Reserved.
+    </p>
+  </div>
 
 </div> <!-- end container -->
 
+<!-- PDF libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
   let cfChartInstance = null;
   let cumCfChartInstance = null;
@@ -403,6 +450,10 @@
   }
 
   function runAnalysis() {
+    const farmerName   = document.getElementById('farmerName').value.trim();
+    const villageName  = document.getElementById('villageName').value.trim();
+    const phoneNumber  = document.getElementById('phoneNumber').value.trim();
+
     const areaAcre      = parseFloat(document.getElementById('areaAcre').value);
     const density       = parseFloat(document.getElementById('density').value);
     const yieldPerCol   = parseFloat(document.getElementById('yieldPerColony').value);
@@ -480,7 +531,7 @@
     // ROI (tanpa diskaun)
     const totalBenefits = baseScenario.benefits.reduce((a,b) => a + b, 0);
     const totalCosts    = baseScenario.totalCosts.reduce((a,b) => a + b, 0);
-    const roi = totalCosts > 0 ? ( (totalBenefits - totalCosts) / totalCosts ) * 100 : null;
+    const roi = totalCosts > 0 ? ((totalBenefits - totalCosts) / totalCosts) * 100 : null;
 
     const paybackText = baseScenario.paybackYear
       ? "Tahun ke-" + baseScenario.paybackYear
@@ -550,7 +601,7 @@
       </table>
     `;
 
-    // Kesimpulan
+    // Kesimpulan berwarna
     let conclusionClass = "conclusion-box";
     let conclusionColor = "";
     let conclusionHeader = "";
@@ -559,7 +610,7 @@
 
     if (npvVal > 0 && irrVal > rPercent && bcrVal !== null && bcrVal > 1 && roiVal !== null && roiVal > 20) {
       conclusionClass += " conclusion-good";
-      conclusionColor = "#1b7f36";
+      conclusionColor = "#c8e6c9";
       conclusionHeader = "PROJEK BERBALOI";
       conclusionText = "Dengan anggaran semasa, projek ini menunjukkan pulangan yang baik dan berpotensi memberi keuntungan stabil kepada penternak.";
       suggestionHtml += "<li>Tingkatkan pemasaran (jenama sendiri, jual terus kepada pengguna) untuk kekalkan harga jual di paras tinggi.</li>";
@@ -568,16 +619,16 @@
       suggestionHtml += "<li>Boleh tambah bilangan koloni secara berperingkat selepas projek stabil.</li>";
     } else if (npvVal > 0 && bcrVal !== null && bcrVal >= 1) {
       conclusionClass += " conclusion-moderate";
-      conclusionColor = "#e68900";
+      conclusionColor = "#ffe082";
       conclusionHeader = "PROJEK BERBALOI (BERJAGA-JAGA)";
       conclusionText = "Projek ini masih boleh diteruskan tetapi margin keuntungan tidak terlalu besar. Penternak perlu mengawal kos dan berusaha meningkatkan hasil.";
       suggestionHtml += "<li>Naikkan hasil madu per koloni melalui latihan teknikal dan amalan penternakan yang lebih baik.</li>";
-      suggestionHtml += "<li>Bandingkan beberapa pembekal input untuk mendapatkan harga yang lebih rendah tanpa menjejaskan kualiti.</li>";
+      suggestionHtml += "<li>Bandingkan beberapa pembekal input untuk mendapatkan harga yang lebih rendah.</li>";
       suggestionHtml += "<li>Kawal kos tenaga kerja supaya selari dengan saiz projek.</li>";
       suggestionHtml += "<li>Manfaatkan bantuan kerajaan, program agropreneur atau geran yang tersedia.</li>";
     } else {
       conclusionClass += " conclusion-bad";
-      conclusionColor = "#c62828";
+      conclusionColor = "#ef9a9a";
       conclusionHeader = "PROJEK BERISIKO / KURANG BERBALOI";
       conclusionText = "Dengan anggaran semasa, projek ini kelihatan berisiko atau kurang menguntungkan. Penternak disaran menilai semula sebelum melabur modal yang besar.";
       suggestionHtml += "<li>Cuba tingkatkan harga jual melalui pembungkusan lebih baik, pensijilan atau pemasaran terus kepada pengguna.</li>";
@@ -602,6 +653,10 @@
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML =
       `<div class="result-box">
+         <p><strong>Nama penternak:</strong> ${farmerName || "-"}</p>
+         <p><strong>Kampung / lokasi:</strong> ${villageName || "-"}</p>
+         <p><strong>No. telefon:</strong> ${phoneNumber || "-"}</p>
+         <hr>
          <p><strong>Keluasan:</strong> ${fmt(areaAcre)} ekar</p>
          <p><strong>Kepadatan koloni:</strong> ${density.toFixed(0)} koloni/ekar
             &nbsp;→&nbsp; <strong>Bilangan koloni:</strong> ${fmt(colonies,0)} koloni</p>
@@ -666,7 +721,7 @@
       </p>
     `;
 
-    // -------- GRAF 1: Aliran Tunai Bersih --------
+    // GRAF 1: Aliran Tunai Bersih
     const yearLabels = [];
     const cfData = [];
     let cum = 0;
@@ -689,8 +744,8 @@
         datasets: [{
           label: 'Aliran Tunai Bersih (RM)',
           data: cfData,
-          backgroundColor: 'rgba(54, 162, 235, 0.5)',
-          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: 'rgba(255, 202, 40, 0.5)',
+          borderColor: 'rgba(255, 202, 40, 1)',
           borderWidth: 1
         }]
       },
@@ -701,7 +756,7 @@
       }
     });
 
-    // -------- GRAF 2: Aliran Tunai Terkumpul --------
+    // GRAF 2: Aliran Tunai Terkumpul
     if (cumCfChartInstance) cumCfChartInstance.destroy();
     const cumCtx = document.getElementById('cumCfChart').getContext('2d');
     cumCfChartInstance = new Chart(cumCtx, {
@@ -712,8 +767,8 @@
           label: 'Aliran Tunai Terkumpul (RM)',
           data: cumData,
           fill: false,
-          borderColor: 'rgba(75, 192, 192, 1)',
-          backgroundColor: 'rgba(75, 192, 192, 0.3)',
+          borderColor: 'rgba(129, 199, 132, 1)',
+          backgroundColor: 'rgba(129, 199, 132, 0.3)',
           tension: 0.2,
           borderWidth: 2
         }]
@@ -725,7 +780,7 @@
       }
     });
 
-    // -------- GRAF 3: NPV vs Faktor Harga --------
+    // GRAF 3: NPV vs Faktor Harga
     if (npvSensChartInstance) npvSensChartInstance.destroy();
     const npvCtx = document.getElementById('npvSensChart').getContext('2d');
     npvSensChartInstance = new Chart(npvCtx, {
@@ -736,18 +791,18 @@
           label: 'NPV mengikut Senario Harga (RM)',
           data: sensNPV,
           backgroundColor: [
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(255, 159, 64, 0.6)',
-            'rgba(255, 205, 86, 0.6)',
-            'rgba(75, 192, 192, 0.6)',
-            'rgba(54, 162, 235, 0.6)'
+            'rgba(239, 83, 80, 0.7)',
+            'rgba(255, 183, 77, 0.7)',
+            'rgba(255, 241, 118, 0.7)',
+            'rgba(129, 199, 132, 0.7)',
+            'rgba(255, 213, 79, 0.7)'
           ],
           borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(255, 159, 64, 1)',
-            'rgba(255, 205, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(54, 162, 235, 1)'
+            'rgba(239, 83, 80, 1)',
+            'rgba(255, 183, 77, 1)',
+            'rgba(255, 241, 118, 1)',
+            'rgba(129, 199, 132, 1)',
+            'rgba(255, 213, 79, 1)'
           ],
           borderWidth: 1
         }]
@@ -757,6 +812,40 @@
         plugins: { legend: { display: true } },
         scales: { y: { beginAtZero: true } }
       }
+    });
+  }
+
+  // Fungsi Muat Turun PDF
+  function downloadPDF() {
+    const report = document.getElementById('reportArea');
+    if (!report) return;
+
+    const { jsPDF } = window.jspdf;
+
+    html2canvas(report, { scale: 2 }).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pdfWidth;
+      const imgHeight = canvas.height * pdfWidth / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pdfHeight;
+
+      // Jika kandungan melebihi satu muka surat
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pdfHeight;
+      }
+
+      pdf.save('Laporan_Projek_Madu_Kelulut.pdf');
     });
   }
 </script>
