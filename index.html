@@ -206,10 +206,22 @@
     <input id="yieldPerColony" type="number" value="2.5">
   </label>
 
-  <!-- B. Hasil Projek -->
-  <div class="section-title">B. Hasil Projek</div>
-  <label>Harga Jual Madu (RM/kg):
+  <!-- B. Hasil Produk -->
+  <div class="section-title">B. Hasil Produk</div>
+  <label>Harga jual madu kelulut (RM/kg):
     <input id="price" type="number" value="200">
+  </label>
+  <label>Hasil propolis (titis) per koloni setahun (RM/koloni/tahun):
+    <input id="propIncomePerCol" type="number" value="30">
+  </label>
+  <label>Hasil sabun madu kelulut per koloni setahun (RM/koloni/tahun):
+    <input id="soapIncomePerCol" type="number" value="20">
+  </label>
+  <label>Nama lain-lain produk (pilihan):
+    <input id="otherProductName" type="text" placeholder="Contoh: Bee bread / minuman kesihatan madu kelulut">
+  </label>
+  <label>Hasil lain-lain produk per koloni setahun (RM/koloni/tahun):
+    <input id="otherIncomePerCol" type="number" value="0">
   </label>
 
   <!-- C. Kos Pembangunan (Tahun 0) -->
@@ -301,7 +313,7 @@
   <!-- DISCLAIMER & COPYRIGHT -->
   <div class="disclaimer">
     <p class="note" style="font-size:10px; color:#bbbbbb; line-height:1.4;">
-      <strong>Penafian – Bahasa Melayu:</strong><br>
+      <strong>Penafian (Disclaimer) – Bahasa Melayu:</strong><br>
       Kalkulator ini disediakan untuk tujuan pembelajaran dan anggaran kasar sahaja.
       Nilai kos, hasil dan pulangan sebenar mungkin berbeza mengikut lokasi, keadaan ternakan,
       kemahiran pengurusan, harga pasaran serta faktor-faktor lain di luar kawalan pengeluar.
@@ -384,12 +396,24 @@
     return rate;
   }
 
-  function computeScenario(T, areaAcre, density, yieldPerColony, basePrice,
-                           devCost0, inputAnnual, labourAnnual, miscAnnual,
-                           discountRate, priceFactor, colonies) {
-
-    const price = basePrice * priceFactor;
-    const totalKgPerYear = colonies * yieldPerColony;
+  // Senario dengan 4 sumber pendapatan
+  function computeScenario(
+    T,
+    colonies,
+    honeyYieldPerColony,
+    honeyPrice,
+    propIncomePerColony,
+    soapIncomePerColony,
+    otherIncomePerColony,
+    devCost0,
+    inputAnnual,
+    labourAnnual,
+    miscAnnual,
+    discountRate,
+    priceFactor
+  ) {
+    const price = honeyPrice * priceFactor;
+    const totalHoneyKgPerYear = colonies * honeyYieldPerColony;
 
     let cashflows = [];
     let benefits = [];
@@ -400,7 +424,14 @@
     let pvCosts = 0;
 
     for (let t = 0; t <= T; t++) {
-      let benefit = (t === 0) ? 0 : totalKgPerYear * price;
+      let benefit = 0;
+      if (t > 0) {
+        const honeyRev = totalHoneyKgPerYear * price;
+        const propRev  = colonies * propIncomePerColony;
+        const soapRev  = colonies * soapIncomePerColony;
+        const otherRev = colonies * otherIncomePerColony;
+        benefit = honeyRev + propRev + soapRev + otherRev;
+      }
 
       let directCost;
       if (t === 0) {
@@ -435,8 +466,7 @@
     return {
       priceFactor,
       price,
-      colonies,
-      totalKgPerYear,
+      totalHoneyKgPerYear,
       cashflows,
       benefits,
       totalCosts,
@@ -447,17 +477,29 @@
     };
   }
 
-  function computeBreakEvenPrice(T, areaAcre, density, yieldPerColony,
-                                 devCost0, inputAnnual, labourAnnual, miscAnnual,
-                                 discountRate, colonies) {
-
-    const totalKgPerYear = colonies * yieldPerColony;
+  // Harga pulang modal madu, mengambil kira pendapatan lain
+  function computeBreakEvenHoneyPrice(
+    T,
+    colonies,
+    honeyYieldPerColony,
+    propIncomePerColony,
+    soapIncomePerColony,
+    otherIncomePerColony,
+    devCost0,
+    inputAnnual,
+    labourAnnual,
+    miscAnnual,
+    discountRate
+  ) {
+    const totalHoneyKgPerYear = colonies * honeyYieldPerColony;
 
     let pvKg = 0;
+    let pvOther = 0;
     let pvCosts = 0;
 
     for (let t = 0; t <= T; t++) {
-      let benefitKg = (t === 0) ? 0 : totalKgPerYear;
+      let benefitKg = (t === 0) ? 0 : totalHoneyKgPerYear;
+      let otherRev  = (t === 0) ? 0 : colonies * (propIncomePerColony + soapIncomePerColony + otherIncomePerColony);
 
       let directCost;
       if (t === 0) {
@@ -470,12 +512,16 @@
       let totalCost = directCost + contingency;
 
       const df = Math.pow(1 + discountRate, t);
-      pvKg += benefitKg / df;
-      pvCosts += totalCost / df;
+      pvKg     += benefitKg / df;
+      pvOther  += otherRev / df;
+      pvCosts  += totalCost / df;
     }
 
     if (pvKg === 0) return null;
-    return pvCosts / pvKg;
+
+    let required = (pvCosts - pvOther) / pvKg;
+    if (required < 0) required = 0;  // jika pendapatan lain sudah cukup
+    return required;
   }
 
   function runAnalysis() {
@@ -485,8 +531,17 @@
 
     const areaAcre      = parseFloat(document.getElementById('areaAcre').value);
     const density       = parseFloat(document.getElementById('density').value);
-    const yieldPerCol   = parseFloat(document.getElementById('yieldPerColony').value);
-    const basePrice     = parseFloat(document.getElementById('price').value);
+    const honeyYieldPerCol   = parseFloat(document.getElementById('yieldPerColony').value);
+    const honeyPrice     = parseFloat(document.getElementById('price').value);
+
+    let propIncomePerCol = parseFloat(document.getElementById('propIncomePerCol').value);
+    let soapIncomePerCol = parseFloat(document.getElementById('soapIncomePerCol').value);
+    const otherProductName = document.getElementById('otherProductName').value.trim();
+    let otherIncomePerCol = parseFloat(document.getElementById('otherIncomePerCol').value);
+
+    if (isNaN(propIncomePerCol)) propIncomePerCol = 0;
+    if (isNaN(soapIncomePerCol)) soapIncomePerCol = 0;
+    if (isNaN(otherIncomePerCol)) otherIncomePerCol = 0;
 
     const clearCostPerAcre  = parseFloat(document.getElementById('clearCostPerAcre').value);
     const fenceCostPerAcre  = parseFloat(document.getElementById('fenceCostPerAcre').value);
@@ -508,7 +563,7 @@
     const rPercent = parseFloat(document.getElementById('discountRate').value);
     const T        = parseInt(document.getElementById('duration').value);
 
-    if ([areaAcre, density, yieldPerCol, basePrice,
+    if ([areaAcre, density, honeyYieldPerCol, honeyPrice,
          clearCostPerAcre, fenceCostPerAcre, colonySetupCostPerColony,
          numExtractors, extractorUnitCost, numContainers, containerUnitCost,
          insectControlAnnual, labourAnnual, fenceMaintPerAcre,
@@ -520,9 +575,9 @@
 
     const r = rPercent / 100;
 
-    // Bilangan koloni dan hasil
+    // Bilangan koloni dan hasil asas
     const colonies = areaAcre * density;
-    const totalKgPerYear = colonies * yieldPerCol;
+    const totalHoneyKgPerYear = colonies * honeyYieldPerCol;
 
     // Kos pembangunan (tahun 0)
     const devCostClearing = areaAcre * clearCostPerAcre;
@@ -547,14 +602,43 @@
     const miscAnnual   = areaAcre * landRentPerAcreAnnual;
     const labourAnnualCost = labourAnnual;
 
+    // Pendapatan tahunan bagi setiap sumber (senario asas)
+    const honeyRevenueAnnual   = totalHoneyKgPerYear * honeyPrice;
+    const propRevenueAnnual    = colonies * propIncomePerCol;
+    const soapRevenueAnnual    = colonies * soapIncomePerCol;
+    const otherRevenueAnnual   = colonies * otherIncomePerCol;
+    const totalAnnualRevenue   = honeyRevenueAnnual + propRevenueAnnual + soapRevenueAnnual + otherRevenueAnnual;
+
+    // Senario asas (harga madu sedia ada, faktor 1.0)
     const baseScenario = computeScenario(
-      T, areaAcre, density, yieldPerCol, basePrice,
-      devCost0, inputAnnual, labourAnnualCost, miscAnnual, r, 1.0, colonies
+      T,
+      colonies,
+      honeyYieldPerCol,
+      honeyPrice,
+      propIncomePerCol,
+      soapIncomePerCol,
+      otherIncomePerCol,
+      devCost0,
+      inputAnnual,
+      labourAnnualCost,
+      miscAnnual,
+      r,
+      1.0
     );
 
-    const breakEvenPrice = computeBreakEvenPrice(
-      T, areaAcre, density, yieldPerCol,
-      devCost0, inputAnnual, labourAnnualCost, miscAnnual, r, colonies
+    // Harga pulang modal madu (ambil kira hasil lain)
+    const breakEvenPrice = computeBreakEvenHoneyPrice(
+      T,
+      colonies,
+      honeyYieldPerCol,
+      propIncomePerCol,
+      soapIncomePerCol,
+      otherIncomePerCol,
+      devCost0,
+      inputAnnual,
+      labourAnnualCost,
+      miscAnnual,
+      r
     );
 
     // ROI (tanpa diskaun)
@@ -571,60 +655,78 @@
     const bcrVal = baseScenario.bcr;
     const roiVal = roi;
 
-    // Jadual ringkasan penunjuk kewangan
+    // Jadual ringkasan penunjuk kewangan + takrif guna nombor sebenar
     const metricsTable = `
       <h3>Ringkasan Penunjuk Kewangan &amp; Takrif Ringkas</h3>
       <table>
         <tr>
           <th style="text-align:left;">Penunjuk</th>
           <th>Nilai</th>
-          <th style="text-align:left;">Takrif Ringkas</th>
+          <th style="text-align:left;">Takrif Ringkas (guna nilai anggaran ini)</th>
         </tr>
         <tr>
           <td style="text-align:left;">NPV (Nilai Kini Bersih)</td>
           <td>RM ${coloredFmt(npvVal)}</td>
           <td style="text-align:left;">
-            Lebihan wang projek selepas tolak semua kos dan ambil kira nilai masa wang.
-            Jika NPV &gt; 0, projek biasanya dianggap menguntungkan.
+            Dalam contoh ini, NPV ≈ <strong>RM ${fmt(npvVal)}</strong>.
+            Ini bermaksud selepas menolak semua kos dan mendiskaunkan aliran tunai
+            pada kadar sekitar <strong>${fmt(rPercent,0)}%</strong> setahun,
+            projek dijangka memberi lebihan nilai bersih sebanyak RM ${fmt(npvVal)}.
           </td>
         </tr>
         <tr>
           <td style="text-align:left;">IRR (Kadar Pulangan Dalaman)</td>
           <td>${coloredFmt(irrVal)} %</td>
           <td style="text-align:left;">
-            Purata kadar pulangan setahun. Jika IRR lebih tinggi daripada kadar diskaun
-            (contoh 3–10%), projek dianggap menarik.
+            Di sini, IRR ≈ <strong>${fmt(irrVal)}%</strong>.
+            Ini ialah kadar pulangan tahunan anggaran projek. Jika nilai ini
+            lebih tinggi daripada kadar diskaun (contoh ${fmt(rPercent,0)}%),
+            projek biasanya dianggap menarik dari sudut kewangan.
           </td>
         </tr>
         <tr>
           <td style="text-align:left;">BCR (Nisbah Faedah-Kos)</td>
           <td>${bcrVal !== null ? bcrVal.toFixed(2) : "-"}</td>
           <td style="text-align:left;">
-            Perbandingan jumlah faedah dengan jumlah kos. Jika BCR &gt; 1,
-            faedah lebih besar daripada kos.
+            Dalam contoh ini, BCR ≈ <strong>${bcrVal !== null ? bcrVal.toFixed(2) : "-"}</strong>.
+            Ini bermaksud secara anggaran, setiap RM1 kos akan menghasilkan kira-kira
+            RM ${bcrVal !== null ? bcrVal.toFixed(2) : "-"} nilai faedah (sebelum ditolak kos).
+            Jika BCR &gt; 1, faedah lebih besar daripada kos.
           </td>
         </tr>
         <tr>
           <td style="text-align:left;">ROI (Pulangan atas Pelaburan)</td>
           <td>${roiVal !== null ? coloredFmt(roiVal) : "-"} %</td>
           <td style="text-align:left;">
-            Pulangan kasar berbanding jumlah kos. Contoh ROI = 30% bermaksud setiap RM1 kos
-            menghasilkan lebih kurang 30 sen keuntungan sepanjang projek.
+            Di sini, ROI ≈ <strong>${roiVal !== null ? fmt(roiVal) : "-" }%</strong>.
+            Ini menunjukkan anggaran peratus keuntungan kasar berbanding jumlah kos
+            sepanjang projek. Contohnya ROI 30% bermaksud setiap RM1 kos menghasilkan
+            sekitar 30 sen keuntungan kasar.
           </td>
         </tr>
         <tr>
-          <td style="text-align:left;">Harga Pulang Modal (Break-even Price)</td>
-          <td>${breakEvenPrice !== null ? "RM " + fmt(breakEvenPrice) + " /kg" : "-"}</td>
+          <td style="text-align:left;">Harga Pulang Modal Madu</td>
+          <td>${
+            breakEvenPrice !== null
+              ? "RM " + fmt(breakEvenPrice) + " /kg"
+              : "-"
+          }</td>
           <td style="text-align:left;">
-            Harga minimum madu (RM/kg) supaya projek tidak rugi (NPV = 0).
+            Mengambil kira juga pendapatan daripada propolis, sabun dan lain-lain
+            produk (jika ada), harga madu minimum yang diperlukan untuk projek
+            tidak rugi (NPV ≈ 0) dianggarkan sekitar
+            <strong>${
+              breakEvenPrice !== null ? "RM " + fmt(breakEvenPrice) + " /kg" : "-"
+            }</strong>.
           </td>
         </tr>
         <tr>
           <td style="text-align:left;">Tempoh Pulang Modal (Payback Period)</td>
           <td>${paybackText}</td>
           <td style="text-align:left;">
-            Tahun bila jumlah aliran tunai terkumpul mula positif; selepas tahun ini projek
-            benar-benar memberi lebihan.
+            Dalam contoh ini, modal dijangka kembali sekitar
+            <strong>${paybackText}</strong>, iaitu tahun di mana jumlah aliran
+            tunai terkumpul mula positif.
           </td>
         </tr>
       </table>
@@ -685,7 +787,16 @@
          <p><strong>Keluasan:</strong> ${fmt(areaAcre)} ekar</p>
          <p><strong>Kepadatan koloni:</strong> ${density.toFixed(0)} koloni/ekar
             &nbsp;→&nbsp; <strong>Bilangan koloni:</strong> ${fmt(colonies,0)} koloni</p>
-         <p><strong>Jumlah hasil madu setahun:</strong> ${fmt(totalKgPerYear)} kg/tahun</p>
+         <p><strong>Jumlah hasil madu setahun:</strong> ${fmt(totalHoneyKgPerYear)} kg/tahun
+            &nbsp;→&nbsp; anggaran nilai: RM ${fmt(honeyRevenueAnnual)}</p>
+         <p><strong>Anggaran hasil propolis setahun:</strong> RM ${fmt(propRevenueAnnual)}</p>
+         <p><strong>Anggaran hasil sabun madu setahun:</strong> RM ${fmt(soapRevenueAnnual)}</p>
+         <p><strong>Anggaran hasil lain-lain produk setahun${
+           otherProductName ? " (" + otherProductName + ")" : ""
+         }:</strong> RM ${fmt(otherRevenueAnnual)}</p>
+         <p><strong>Jumlah semua hasil setahun (madu + propolis + sabun + lain-lain):</strong>
+            RM ${fmt(totalAnnualRevenue)}</p>
+         <hr>
          <p><strong>Jumlah kos pembangunan (tahun 0):</strong> RM ${fmt(devCost0)}</p>
          <p><strong>Kos bahan input tahunan setara:</strong> RM ${fmt(inputAnnual)} / tahun</p>
          <p><strong>Kos tenaga kerja tahunan:</strong> RM ${fmt(labourAnnualCost)} / tahun</p>
@@ -710,9 +821,9 @@
     table += "</table>";
     resultsDiv.innerHTML += table;
 
-    // Analisis sensitiviti harga
-    let sensTable = "<h3>Analisis Sensitiviti Harga (NPV, IRR, BCR)</h3>";
-    sensTable += "<table><tr><th>Senario</th><th>Faktor Harga</th><th>Harga/kg (RM)</th><th>NPV (RM)</th><th>IRR (%)</th><th>BCR</th></tr>";
+    // Analisis sensitiviti harga (madu sahaja, hasil lain kekal)
+    let sensTable = "<h3>Analisis Sensitiviti Harga Madu (NPV, IRR, BCR)</h3>";
+    sensTable += "<table><tr><th>Senario</th><th>Faktor Harga</th><th>Harga madu/kg (RM)</th><th>NPV (RM)</th><th>IRR (%)</th><th>BCR</th></tr>";
 
     const factors = [0.8, 0.9, 1.0, 1.1, 1.2];
     const sensLabels = [];
@@ -720,8 +831,19 @@
 
     factors.forEach((f, idx) => {
       const sc = computeScenario(
-        T, areaAcre, density, yieldPerCol, basePrice,
-        devCost0, inputAnnual, labourAnnualCost, miscAnnual, r, f, colonies
+        T,
+        colonies,
+        honeyYieldPerCol,
+        honeyPrice,
+        propIncomePerCol,
+        soapIncomePerCol,
+        otherIncomePerCol,
+        devCost0,
+        inputAnnual,
+        labourAnnualCost,
+        miscAnnual,
+        r,
+        f
       );
       sensLabels.push((f * 100).toFixed(0) + "%");
       sensNPV.push(sc.npv);
@@ -817,7 +939,7 @@
       }
     });
 
-    // GRAF 3: NPV vs Faktor Harga
+    // GRAF 3: NPV vs Faktor Harga (madu)
     const npvBarColors = sensNPV.map(v =>
       v < 0 ? 'rgba(255, 82, 82, 0.9)' : 'rgba(255, 213, 79, 0.7)'
     );
@@ -832,7 +954,7 @@
       data: {
         labels: sensLabels,
         datasets: [{
-          label: 'NPV mengikut Senario Harga (RM)',
+          label: 'NPV mengikut Senario Harga Madu (RM)',
           data: sensNPV,
           backgroundColor: npvBarColors,
           borderColor: npvBorderColors,
@@ -850,7 +972,7 @@
     resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // Fungsi Muat Turun PDF (tanpa watermark sekarang)
+  // Fungsi Muat Turun PDF (tanpa watermark)
   function downloadPDF() {
     const report = document.getElementById('reportArea');
     if (!report) return;
