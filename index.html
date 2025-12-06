@@ -179,7 +179,7 @@
   <!-- Maklumat Penternak -->
   <div class="section-title">Maklumat Penternak</div>
   <label>Nama penternak:
-    <input id="farmerName" type="text" placeholder="Contoh: Robin Lim Ah Hee">
+    <input id="farmerName" type="text" placeholder="Contoh: Assis Kamu">
   </label>
   <label>Nama kampung / lokasi:
     <input id="villageName" type="text" placeholder="Contoh: Kg. Kiau Nuluh, Kota Belud">
@@ -334,10 +334,12 @@
   let cumCfChartInstance = null;
   let npvSensChartInstance = null;
 
-  // Format nombor dengan koma ribu
+  // Format nombor dengan koma ribu – versi stabil
   function fmt(x, decimals = 2) {
     if (x === null || isNaN(x)) return "-";
-    return x.toFixed(decimals).replace(/\B?(?=(\d{3})+(?!\d))/g, ",");
+    const parts = x.toFixed(decimals).split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
   }
 
   function npv(rate, cashflows) {
@@ -827,7 +829,7 @@
     resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // Fungsi Muat Turun PDF dengan watermark "Analisis Anggaran"
+  // Fungsi Muat Turun PDF dengan watermark "Analisis Kewangan"
   function downloadPDF() {
     const report = document.getElementById('reportArea');
     if (!report) return;
