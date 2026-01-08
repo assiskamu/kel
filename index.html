@@ -140,8 +140,16 @@
     .section-map a { color: var(--amber); text-decoration: none; padding: 2px 6px; border-radius: 999px; border: 1px solid #333; background: #1a1a1a; }
     .section-map a:hover { background: #222; }
     .map-sep { color: #777; }
-    details { background: #121212; border: 1px solid #222; border-radius: 6px; padding: 6px 8px; margin-top: 8px; }
-    summary { cursor: pointer; color: var(--gold); font-weight: bold; }
+    details { background: #121212; border: 1px solid #222; border-radius: 6px; padding: 0; margin-top: 8px; }
+    summary { cursor: pointer; color: var(--gold); font-weight: bold; padding: 8px 10px; list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    details > summary:focus { outline: 2px solid rgba(255, 202, 40, 0.6); outline-offset: 2px; }
+    .step { background: #0f0f0f; border: 1px solid #2b2418; border-radius: 10px; margin-top: 12px; }
+    .step > summary { background: linear-gradient(90deg, rgba(255,202,40,0.18), rgba(18,18,18,0.9)); font-size: 16px; padding: 12px 14px; }
+    .step[open] > summary { border-bottom: 1px solid rgba(255, 213, 79, 0.4); }
+    .section { background: #131313; border: 1px solid #2a2a2a; }
+    .section > summary { background: #1a1a1a; font-size: 14px; }
+    .section-body { padding: 8px 10px 10px; }
     .error-text { color: var(--danger); font-size: 11px; min-height: 14px; }
     .invalid { border-color: var(--danger); box-shadow: 0 0 0 1px rgba(255,82,82,0.4); }
     .error-summary { background: rgba(183,28,28,0.15); color: #ffcdd2; border: 1px solid rgba(255,82,82,0.6); padding: 8px; border-radius: 6px; margin-top: 10px; display: none; }
@@ -168,316 +176,366 @@
     <strong>Arahan:</strong> Ikuti <strong>Langkah 1 hingga 3</strong>. Pilih <strong>Mod Ringkas</strong> jika mahu isi bilangan koloni terus atau <strong>Mod Terperinci</strong> jika mahu berdasarkan keluasan & kepadatan. Tekan <strong>"Kira Analisis"</strong> untuk lihat NPV, IRR, BCR, ROI, graf dan PDF.
   </p>
 
-  <!-- Maklumat Penternak -->
-  <div class="section-title" id="sectionA">A. Maklumat Ladang</div>
-  <label>Nama penternak:
-    <input id="farmerName" type="text" placeholder="Nama penternak">
-  </label>
-  <div class="hint-example">Contoh: Assis Kamu</div>
-  <label>Nama Kampung (untuk laporan):
-    <input id="villageName" type="text" placeholder="Nama kampung">
-  </label>
-  <div class="hint-example">Contoh: Kg. Kiau, Kota Belud</div>
-  <label>No. telefon:
-    <input id="phoneNumber" type="text" placeholder="Contoh: 012-3456789">
-  </label>
-
-  <div class="section-title">Peta Ringkas Bahagian</div>
-  <nav class="section-map" aria-label="Peta Ringkas Bahagian">
-    <a href="#sectionA">A Ladang</a><span class="map-sep">|</span>
-    <a href="#sectionB">B Hasil</a><span class="map-sep">|</span>
-    <a href="#sectionB2">B2 Risiko</a><span class="map-sep">|</span>
-    <a href="#sectionC">C Kos Mula</a><span class="map-sep">|</span>
-    <a href="#sectionD">D Input</a><span class="map-sep">|</span>
-    <a href="#sectionE">E Upah</a><span class="map-sep">|</span>
-    <a href="#sectionF">F Pelbagai</a><span class="map-sep">|</span>
-    <a href="#sectionG">G Tetapan</a><span class="map-sep">|</span>
-    <a href="#sectionH">H Graf</a>
-  </nav>
-
-  <!-- LANGKAH 1 -->
-  <div class="section-title">Langkah 1: Saiz ternakan & hasil (B & B2)</div>
-  <div class="step-card">
-    <div class="mode-row">
-      <label class="pill"><input type="radio" name="mode" value="simple" id="modeSimple"> Mod Ringkas (Kampung)</label>
-      <label class="pill"><input type="radio" name="mode" value="detailed" id="modeDetailed" checked> Mod Terperinci (Profesional)</label>
-    </div>
-    <div id="simpleMode" style="display:none;">
-      <label>Bilangan koloni (isi terus):
-        <input id="coloniesDirect" type="number" min="0" step="1" value="30">
-      </label>
-      <div class="error-text" id="err-coloniesDirect"></div>
-    </div>
-    <div id="detailedMode">
-      <label>Keluasan (ekar):
-        <input id="areaAcre" type="number" min="0" step="0.1" value="1">
-      </label>
-      <div class="error-text" id="err-areaAcre"></div>
-      <label>Kepadatan koloni (koloni/ekar):
-        <input id="density" type="number" min="0" step="1" value="30">
-      </label>
-      <div class="error-text" id="err-density"></div>
-      <div class="note" id="colonyEstimate">Anggaran bilangan koloni: 30</div>
-    </div>
-
-    <label>Hasil madu per koloni setahun (kg/koloni/tahun):
-      <input id="yieldPerColony" type="number" min="0" step="0.1" value="2.5">
-      <small class="hint">Contoh anggaran: 1.5 – 3.5 kg/koloni/tahun bergantung penjagaan & cuaca.</small>
-    </label>
-    <div class="error-text" id="err-yieldPerColony"></div>
-
-    <div class="inline" style="margin-top:4px;">
-      <label class="pill"><input type="checkbox" id="enableYear1LowerYield"> Tahun 1 hasil lebih rendah</label>
-      <div style="max-width:180px;">
-        <label>Faktor hasil Tahun 1 (%):
-          <input id="year1YieldFactor" type="number" min="0" max="100" step="5" value="70">
-        </label>
-      </div>
-    </div>
-
-    <div class="section-title" id="sectionB">B. Hasil Produk</div>
-    <label>Harga jual madu kelulut (RM/kg):
-      <input id="price" type="number" min="0" step="1" value="200">
-    </label>
-    <div class="error-text" id="err-price"></div>
-    <label>Hasil propolis (titis) per koloni setahun (RM/koloni/tahun):
-      <input id="propIncomePerCol" type="number" min="0" step="1" value="30">
-    </label>
-    <label>Hasil sabun madu kelulut per koloni setahun (RM/koloni/tahun):
-      <input id="soapIncomePerCol" type="number" min="0" step="1" value="20">
-    </label>
-    <label>Nama lain-lain produk (pilihan):
-      <input id="otherProductName" type="text" placeholder="Contoh: Bee bread / minuman kesihatan madu kelulut">
-    </label>
-    <label>Hasil lain-lain produk per koloni setahun (RM/koloni/tahun):
-      <input id="otherIncomePerCol" type="number" min="0" step="1" value="0">
-    </label>
-
-    <div class="section-title" id="sectionB2">B2. Risiko Penternakan (Mortaliti)</div>
-    <label>Kadar koloni mati/rosak setahun (%):
-      <input id="mortalityRatePercent" type="number" min="0" max="100" step="0.5" value="0">
-    </label>
-    <label>Kos ganti koloni (RM/koloni mati):
-      <input id="replacementColonyCost" type="number" min="0" step="50" value="1000">
-    </label>
-
-    <details>
-      <summary>Pelan tambah koloni (pilihan)</summary>
-      <div class="inline">
-        <label class="pill"><input type="checkbox" id="enableExpansion"> Tambah koloni setiap tahun</label>
-        <label class="pill"><input type="radio" name="expansionMode" value="increment" checked> +N koloni/tahun</label>
-        <label class="pill"><input type="radio" name="expansionMode" value="percent"> +X% koloni/tahun</label>
-      </div>
-      <label>Tambah tetap (+N koloni/tahun):
-        <input id="expansionIncrement" type="number" min="0" step="1" value="0">
-      </label>
-      <label>Tambah peratus (+X%/tahun):
-        <input id="expansionPercent" type="number" min="0" step="1" value="0">
-      </label>
-      <p class="note">Kos tambah koloni akan dikira menggunakan kos pembinaan koloni sedia ada (RM/koloni).</p>
-    </details>
-  </div>
-
-  <!-- LANGKAH 2 -->
-  <div class="section-title">Langkah 2: Kos (C – F + kos tambahan)</div>
-  <div class="step-card">
-    <details open>
-      <summary id="sectionC">C. Kos Pembangunan (Tahun 0)</summary>
-      <label>Pembersihan kawasan (RM/ekar, sekali – tahun 0):
-        <input id="clearCostPerAcre" type="number" min="0" step="50" value="1000">
-      </label>
-      <label>Pembinaan pagar (RM/ekar, sekali – tahun 0):
-        <input id="fenceCostPerAcre" type="number" min="0" step="50" value="1000">
-      </label>
-      <label>Pembinaan koloni kelulut (kotak + topping) (RM/koloni, tahun 0):
-        <input id="colonySetupCostPerColony" type="number" min="0" step="50" value="1000">
-      </label>
-      <label>Bilangan alat penyedut madu bermotor (unit – tahun 0):
-        <input id="numExtractors" type="number" min="0" step="1" value="1">
-      </label>
-      <label>Kos satu alat penyedut madu bermotor (RM/unit):
-        <input id="extractorUnitCost" type="number" min="0" step="10" value="200">
-      </label>
-      <label>Bilangan bekas simpanan madu (5kg):
-        <input id="numContainers" type="number" min="0" step="1" value="1">
-      </label>
-      <label>Kos satu bekas simpanan madu 5kg (RM/unit):
-        <input id="containerUnitCost" type="number" min="0" step="5" value="50">
-      </label>
-      <label>Kos pembangunan lain-lain (sekali – Tahun 0) (RM):
-        <input id="devCostOther0" type="number" min="0" step="10" value="0">
-      </label>
-      <div class="helper-box">
-        <div class="hint-example"><strong>Contoh item (sekali beli):</strong></div>
-        <ul class="hint-example" style="margin:6px 0 0 18px;">
-          <li>Tikar bumbung log kelulut / kanopi (canvas/plywood)</li>
-          <li>Bakul/tray pam madu (jika aset)</li>
-          <li>Cat/berus/gergaji dan bahan bina awal</li>
-        </ul>
-      </div>
-    </details>
-
-    <details open>
-      <summary id="sectionD">D. Kos Bahan Input</summary>
-      <label>Kos kawalan serangga (RM/setahun):
-        <input id="insectControlAnnual" type="number" min="0" step="10" value="100">
-      </label>
-      <label>Bahan habis pakai lain-lain (RM/setahun):
-        <input id="otherOpexAnnual" type="number" min="0" step="10" value="0">
-      </label>
-      <div class="helper-box">
-        <div class="hint-example"><strong>Contoh item (ulang beli):</strong></div>
-        <ul class="hint-example" style="margin:6px 0 0 18px;">
-          <li>Ethanol 95% (pembersihan)</li>
-          <li>Gas butane</li>
-          <li>Laminating/label koloni (jika bukan label botol)</li>
-          <li>Marker & alat tulis, bahan kecil lain</li>
-        </ul>
-      </div>
-      <div class="helper-box">
-        <div class="hint-example"><strong>Cara kira setahun:</strong></div>
-        <ul class="hint-example" style="margin:6px 0 0 18px;">
-          <li>RM30/bulan → RM360/setahun</li>
-          <li>RM10/minggu → ±RM520/setahun</li>
-          <li>(Jika tidak pasti, guna anggaran konservatif.)</li>
-        </ul>
-      </div>
-    </details>
-
-    <details open>
-      <summary id="sectionF">F. Kos Pelbagai (Penyelenggaraan & Utiliti)</summary>
-      <label>Penyelenggaraan pagar (RM/ekar setiap 3 tahun):
-        <input id="fenceMaintPerAcre" type="number" min="0" step="10" value="300">
-      </label>
-      <label>Penyelenggaraan / alat ganti alat penyedut madu bermotor (RM/setahun):
-        <input id="extractorMaintAnnual" type="number" min="0" step="10" value="50">
-      </label>
-      <label>Penggantian kotak koloni + kotak topping (RM/koloni setiap 2 tahun):
-        <input id="colonyReplacementCostPerColony" type="number" min="0" step="10" value="50">
-      </label>
-      <label>Sewa tanah (RM/ekar setahun – kos utiliti):
-        <input id="landRentPerAcreAnnual" type="number" min="0" step="10" value="500">
-      </label>
-    </details>
-
-    <details open>
-      <summary id="sectionE">E. Kos Tenaga Kerja</summary>
-      <label>Kos tenaga kerja (RM/setahun):
-        <input id="labourCostAnnual" type="number" min="0" step="50" value="6000">
-      </label>
-    </details>
-
-    <details>
-      <summary>Kos tambahan pilihan (boleh tanda jika berkaitan)</summary>
-      <label class="inline"><input type="checkbox" id="enablePackaging"> Aktifkan kos botol & label</label>
-      <div id="packagingFields" style="display:none;">
-        <label>Saiz botol (ml):
-          <input id="bottleSizeMl" type="number" min="1" step="10" value="250">
-        </label>
-        <label>Kos botol (RM/botol):
-          <input id="bottleCost" type="number" min="0" step="0.1" value="1.5">
-        </label>
-        <label>Kos label (RM/botol):
-          <input id="labelCost" type="number" min="0" step="0.1" value="0.5">
-        </label>
-        <label>Kos pembungkusan tambahan (RM/botol):
-          <input id="packagingCost" type="number" min="0" step="0.1" value="0.3">
-        </label>
-      </div>
-
-      <label class="inline"><input type="checkbox" id="enableTransport"> Aktifkan kos pengangkutan/pos</label>
-      <div id="transportFields" style="display:none;">
-        <div class="inline">
-          <label class="pill"><input type="radio" name="transportMode" value="perKg" checked> Berdasarkan kg madu</label>
-          <label class="pill"><input type="radio" name="transportMode" value="annual"> Jumlah setahun</label>
+  <details class="step" id="step1">
+    <summary>Langkah 1: Maklumat ladang & hasil (A, B, B2)</summary>
+    <div class="step-card">
+      <details class="section" id="secA">
+        <summary id="sectionA">A. Maklumat Ladang</summary>
+        <div class="section-body">
+          <label>Nama penternak:
+            <input id="farmerName" type="text" placeholder="Nama penternak">
+          </label>
+          <label>Nama Kampung (untuk laporan):
+            <input id="villageName" type="text" placeholder="Nama kampung">
+          </label>
+          <label>No. telefon:
+            <input id="phoneNumber" type="text" placeholder="No. telefon">
+          </label>
         </div>
-        <label>Jika per kg: kos pengangkutan (RM/kg madu):
-          <input id="transportCostPerKg" type="number" min="0" step="0.1" value="0">
-        </label>
-        <label>Jika jumlah setahun: kos pengangkutan (RM/tahun):
-          <input id="transportCostAnnual" type="number" min="0" step="10" value="0">
-        </label>
-      </div>
+      </details>
 
-      <label class="inline"><input type="checkbox" id="enableFeeding"> Aktifkan kos feeding / makanan tambahan</label>
-      <div id="feedingFields" style="display:none;">
-        <label>Kos feeding (RM/setahun):
-          <input id="feedingCostAnnual" type="number" min="0" step="10" value="0">
-        </label>
-      </div>
+      <details class="section" id="secB">
+        <summary id="sectionB">B. Hasil Produk</summary>
+        <div class="section-body">
+          <div class="mode-row">
+            <label class="pill"><input type="radio" name="mode" value="simple" id="modeSimple"> Mod Ringkas (Kampung)</label>
+            <label class="pill"><input type="radio" name="mode" value="detailed" id="modeDetailed" checked> Mod Terperinci (Profesional)</label>
+          </div>
+          <div id="simpleMode" style="display:none;">
+            <label>Bilangan koloni (isi terus):
+              <input id="coloniesDirect" type="number" min="0" step="1" value="30">
+            </label>
+            <div class="error-text" id="err-coloniesDirect"></div>
+          </div>
+          <div id="detailedMode">
+            <label>Keluasan (ekar):
+              <input id="areaAcre" type="number" min="0" step="0.1" value="1">
+            </label>
+            <div class="error-text" id="err-areaAcre"></div>
+            <label>Kepadatan koloni (koloni/ekar):
+              <input id="density" type="number" min="0" step="1" value="30">
+            </label>
+            <div class="error-text" id="err-density"></div>
+            <div class="note" id="colonyEstimate">Anggaran bilangan koloni: 30</div>
+          </div>
 
-      <label class="inline"><input type="checkbox" id="enableCompliance"> Aktifkan kos pensijilan/ujian/lesen</label>
-      <div id="complianceFields" style="display:none;">
-        <label>Kos pensijilan/ujian/lesen (RM/setahun):
-          <input id="complianceCostAnnual" type="number" min="0" step="10" value="0">
-        </label>
-      </div>
-    </details>
-  </div>
+          <label>Hasil madu per koloni setahun (kg/koloni/tahun):
+            <input id="yieldPerColony" type="number" min="0" step="0.1" value="2.5">
+            <small class="hint">Contoh anggaran: 1.5 – 3.5 kg/koloni/tahun bergantung penjagaan & cuaca.</small>
+          </label>
+          <div class="error-text" id="err-yieldPerColony"></div>
 
-  <details open>
-    <summary>Preview cepat (anggaran Tahun 1)</summary>
-    <div class="three-cards">
-      <div class="mini-card"><h4>Anggaran madu Tahun 1</h4><div class="badge" id="previewHoney">-</div><small class="note">Termasuk faktor hasil Tahun 1 & mortaliti Tahun 1.</small></div>
-      <div class="mini-card"><h4>Anggaran botol (jika pembungkusan)</h4><div class="badge" id="previewBottles">-</div><small class="note">Berdasarkan saiz botol & hasil madu Tahun 1.</small></div>
-      <div class="mini-card"><h4>Kos tahunan Tahun 1 (RM)</h4><div class="badge" id="previewCost">-</div><small class="note">Kos asas + opsyen + kontinjensi.</small></div>
+          <div class="inline" style="margin-top:4px;">
+            <label class="pill"><input type="checkbox" id="enableYear1LowerYield"> Tahun 1 hasil lebih rendah</label>
+            <div style="max-width:180px;">
+              <label>Faktor hasil Tahun 1 (%):
+                <input id="year1YieldFactor" type="number" min="0" max="100" step="5" value="70">
+              </label>
+            </div>
+          </div>
+
+          <label>Harga jual madu kelulut (RM/kg):
+            <input id="price" type="number" min="0" step="1" value="200">
+          </label>
+          <div class="error-text" id="err-price"></div>
+          <label>Hasil propolis (titis) per koloni setahun (RM/koloni/tahun):
+            <input id="propIncomePerCol" type="number" min="0" step="1" value="30">
+          </label>
+          <label>Hasil sabun madu kelulut per koloni setahun (RM/koloni/tahun):
+            <input id="soapIncomePerCol" type="number" min="0" step="1" value="20">
+          </label>
+          <label>Nama lain-lain produk (pilihan):
+            <input id="otherProductName" type="text" placeholder="Contoh: Bee bread / minuman kesihatan madu kelulut">
+          </label>
+          <label>Hasil lain-lain produk per koloni setahun (RM/koloni/tahun):
+            <input id="otherIncomePerCol" type="number" min="0" step="1" value="0">
+          </label>
+        </div>
+      </details>
+
+      <details class="section" id="secB2">
+        <summary id="sectionB2">B2. Risiko Penternakan (Mortaliti)</summary>
+        <div class="section-body">
+          <label>Kadar koloni mati/rosak setahun (%):
+            <input id="mortalityRatePercent" type="number" min="0" max="100" step="0.5" value="0">
+          </label>
+          <label>Kos ganti koloni (RM/koloni mati):
+            <input id="replacementColonyCost" type="number" min="0" step="50" value="1000">
+          </label>
+        </div>
+      </details>
+
+      <details class="section" id="secExpansion">
+        <summary>Pelan tambah koloni (pilihan)</summary>
+        <div class="section-body">
+          <div class="inline">
+            <label class="pill"><input type="checkbox" id="enableExpansion"> Tambah koloni setiap tahun</label>
+            <label class="pill"><input type="radio" name="expansionMode" value="increment" checked> +N koloni/tahun</label>
+            <label class="pill"><input type="radio" name="expansionMode" value="percent"> +X% koloni/tahun</label>
+          </div>
+          <label>Tambah tetap (+N koloni/tahun):
+            <input id="expansionIncrement" type="number" min="0" step="1" value="0">
+          </label>
+          <label>Tambah peratus (+X%/tahun):
+            <input id="expansionPercent" type="number" min="0" step="1" value="0">
+          </label>
+          <p class="note">Kos tambah koloni akan dikira menggunakan kos pembinaan koloni sedia ada (RM/koloni).</p>
+        </div>
+      </details>
+
+      <details class="section" id="secMap">
+        <summary>Peta Ringkas Bahagian</summary>
+        <div class="section-body">
+          <nav class="section-map" aria-label="Peta Ringkas Bahagian">
+            <a href="#sectionA">A Ladang</a><span class="map-sep">|</span>
+            <a href="#sectionB">B Hasil</a><span class="map-sep">|</span>
+            <a href="#sectionB2">B2 Risiko</a><span class="map-sep">|</span>
+            <a href="#sectionC">C Kos Mula</a><span class="map-sep">|</span>
+            <a href="#sectionD">D Input</a><span class="map-sep">|</span>
+            <a href="#sectionE">E Upah</a><span class="map-sep">|</span>
+            <a href="#sectionF">F Pelbagai</a><span class="map-sep">|</span>
+            <a href="#sectionG">G Tetapan</a><span class="map-sep">|</span>
+            <a href="#sectionH">H Graf</a>
+          </nav>
+        </div>
+      </details>
+
+      <div class="inline" style="margin-top:10px;">
+        <button class="btn-secondary btn-inline btn-next" data-next-step="step2">Seterusnya (Langkah 2)</button>
+      </div>
     </div>
   </details>
 
-  <!-- LANGKAH 3 -->
-  <div class="section-title" id="sectionG">Langkah 3: G. Parameter Analisis & Tindakan</div>
-  <div class="step-card">
-    <label>Kadar Diskaun (% setahun):
-      <input id="discountRate" type="number" min="0" step="0.1" value="3">
-      <small class="hint">Jika tidak pasti, boleh guna 3% – 8% bergantung kos modal.</small>
-    </label>
-    <div class="error-text" id="err-discountRate"></div>
-    <label>Tempoh Analisis (tahun ekonomi projek):
-      <input id="duration" type="number" min="1" step="1" value="7">
-    </label>
-    <div class="error-text" id="err-duration"></div>
+  <details class="step" id="step2">
+    <summary>Langkah 2: Kos (C – F + kos tambahan)</summary>
+    <div class="step-card">
+      <details class="section" id="secC">
+        <summary id="sectionC">C. Kos Pembangunan (Tahun 0)</summary>
+        <div class="section-body">
+          <label>Pembersihan kawasan (RM/ekar, sekali – tahun 0):
+            <input id="clearCostPerAcre" type="number" min="0" step="50" value="1000">
+          </label>
+          <label>Pembinaan pagar (RM/ekar, sekali – tahun 0):
+            <input id="fenceCostPerAcre" type="number" min="0" step="50" value="1000">
+          </label>
+          <label>Pembinaan koloni kelulut (kotak + topping) (RM/koloni, tahun 0):
+            <input id="colonySetupCostPerColony" type="number" min="0" step="50" value="1000">
+          </label>
+          <label>Bilangan alat penyedut madu bermotor (unit – tahun 0):
+            <input id="numExtractors" type="number" min="0" step="1" value="1">
+          </label>
+          <label>Kos satu alat penyedut madu bermotor (RM/unit):
+            <input id="extractorUnitCost" type="number" min="0" step="10" value="200">
+          </label>
+          <label>Bilangan bekas simpanan madu (5kg):
+            <input id="numContainers" type="number" min="0" step="1" value="1">
+          </label>
+          <label>Kos satu bekas simpanan madu 5kg (RM/unit):
+            <input id="containerUnitCost" type="number" min="0" step="5" value="50">
+          </label>
+          <label>Kos pembangunan lain-lain (sekali – Tahun 0) (RM):
+            <input id="devCostOther0" type="number" min="0" step="10" value="0">
+          </label>
+          <div class="helper-box">
+            <div class="hint-example"><strong>Contoh item (sekali beli):</strong></div>
+            <ul class="hint-example" style="margin:6px 0 0 18px;">
+              <li>Tikar bumbung log kelulut / kanopi (canvas/plywood)</li>
+              <li>Bakul/tray pam madu (jika aset)</li>
+              <li>Cat/berus/gergaji dan bahan bina awal</li>
+            </ul>
+          </div>
+        </div>
+      </details>
 
-    <label>Kontinjensi (% atas kos tahunan):
-      <input id="contingencyPercent" type="number" min="0" max="100" step="0.5" value="10">
-    </label>
+      <details class="section" id="secD">
+        <summary id="sectionD">D. Kos Bahan Input</summary>
+        <div class="section-body">
+          <label>Kos kawalan serangga (RM/setahun):
+            <input id="insectControlAnnual" type="number" min="0" step="10" value="100">
+          </label>
+          <label>Bahan habis pakai lain-lain (RM/setahun):
+            <input id="otherOpexAnnual" type="number" min="0" step="10" value="0">
+          </label>
+          <div class="helper-box">
+            <div class="hint-example"><strong>Contoh item (ulang beli):</strong></div>
+            <ul class="hint-example" style="margin:6px 0 0 18px;">
+              <li>Ethanol 95% (pembersihan)</li>
+              <li>Gas butane</li>
+              <li>Laminating/label koloni (jika bukan label botol)</li>
+              <li>Marker & alat tulis, bahan kecil lain</li>
+            </ul>
+          </div>
+          <div class="helper-box">
+            <div class="hint-example"><strong>Cara kira setahun:</strong></div>
+            <ul class="hint-example" style="margin:6px 0 0 18px;">
+              <li>RM30/bulan → RM360/setahun</li>
+              <li>RM10/minggu → ±RM520/setahun</li>
+              <li>(Jika tidak pasti, guna anggaran konservatif.)</li>
+            </ul>
+          </div>
+        </div>
+      </details>
 
-    <label>Kenaikan kos tahunan (inflasi kos) %:
-      <input id="costEscalationPercent" type="number" min="0" step="0.1" value="0">
-    </label>
-    <label>Kenaikan harga madu tahunan (inflasi harga) %:
-      <input id="priceEscalationPercent" type="number" min="0" step="0.1" value="0">
-    </label>
+      <details class="section" id="secE">
+        <summary id="sectionE">E. Kos Tenaga Kerja</summary>
+        <div class="section-body">
+          <label>Kos tenaga kerja (RM/setahun):
+            <input id="labourCostAnnual" type="number" min="0" step="50" value="6000">
+          </label>
+        </div>
+      </details>
 
-    <div id="errorSummary" class="error-summary">Sila betulkan medan yang merah.</div>
+      <details class="section" id="secF">
+        <summary id="sectionF">F. Kos Pelbagai (Penyelenggaraan & Utiliti)</summary>
+        <div class="section-body">
+          <label>Penyelenggaraan pagar (RM/ekar setiap 3 tahun):
+            <input id="fenceMaintPerAcre" type="number" min="0" step="10" value="300">
+          </label>
+          <label>Penyelenggaraan / alat ganti alat penyedut madu bermotor (RM/setahun):
+            <input id="extractorMaintAnnual" type="number" min="0" step="10" value="50">
+          </label>
+          <label>Penggantian kotak koloni + kotak topping (RM/koloni setiap 2 tahun):
+            <input id="colonyReplacementCostPerColony" type="number" min="0" step="10" value="50">
+          </label>
+          <label>Sewa tanah (RM/ekar setahun – kos utiliti):
+            <input id="landRentPerAcreAnnual" type="number" min="0" step="10" value="500">
+          </label>
+        </div>
+      </details>
 
-    <div class="inline" style="margin-top:8px; gap:8px; flex-wrap: wrap;">
-      <button class="btn-primary btn-inline" id="btnRun">Kira Analisis</button>
-      <button class="btn-secondary btn-inline" id="btnReset">Reset / Kosongkan</button>
-      <button class="btn-ghost btn-inline" id="btnDemo">Isi Contoh (Demo)</button>
-      <button class="btn-ghost btn-inline" id="btnSave">Simpan</button>
-      <button class="btn-secondary btn-inline" id="btnClearSave">Padam Simpanan</button>
+      <details class="section" id="secOptional">
+        <summary>Kos tambahan pilihan (boleh tanda jika berkaitan)</summary>
+        <div class="section-body">
+          <label class="inline"><input type="checkbox" id="enablePackaging"> Aktifkan kos botol & label</label>
+          <div id="packagingFields" style="display:none;">
+            <label>Saiz botol (ml):
+              <input id="bottleSizeMl" type="number" min="1" step="10" value="250">
+            </label>
+            <label>Kos botol (RM/botol):
+              <input id="bottleCost" type="number" min="0" step="0.1" value="1.5">
+            </label>
+            <label>Kos label (RM/botol):
+              <input id="labelCost" type="number" min="0" step="0.1" value="0.5">
+            </label>
+            <label>Kos pembungkusan tambahan (RM/botol):
+              <input id="packagingCost" type="number" min="0" step="0.1" value="0.3">
+            </label>
+          </div>
+
+          <label class="inline"><input type="checkbox" id="enableTransport"> Aktifkan kos pengangkutan/pos</label>
+          <div id="transportFields" style="display:none;">
+            <div class="inline">
+              <label class="pill"><input type="radio" name="transportMode" value="perKg" checked> Berdasarkan kg madu</label>
+              <label class="pill"><input type="radio" name="transportMode" value="annual"> Jumlah setahun</label>
+            </div>
+            <label>Jika per kg: kos pengangkutan (RM/kg madu):
+              <input id="transportCostPerKg" type="number" min="0" step="0.1" value="0">
+            </label>
+            <label>Jika jumlah setahun: kos pengangkutan (RM/tahun):
+              <input id="transportCostAnnual" type="number" min="0" step="10" value="0">
+            </label>
+          </div>
+
+          <label class="inline"><input type="checkbox" id="enableFeeding"> Aktifkan kos feeding / makanan tambahan</label>
+          <div id="feedingFields" style="display:none;">
+            <label>Kos feeding (RM/setahun):
+              <input id="feedingCostAnnual" type="number" min="0" step="10" value="0">
+            </label>
+          </div>
+
+          <label class="inline"><input type="checkbox" id="enableCompliance"> Aktifkan kos pensijilan/ujian/lesen</label>
+          <div id="complianceFields" style="display:none;">
+            <label>Kos pensijilan/ujian/lesen (RM/setahun):
+              <input id="complianceCostAnnual" type="number" min="0" step="10" value="0">
+            </label>
+          </div>
+        </div>
+      </details>
+
+      <details class="section" id="secPreview">
+        <summary>Preview cepat (anggaran Tahun 1)</summary>
+        <div class="section-body">
+          <div class="three-cards">
+            <div class="mini-card"><h4>Anggaran madu Tahun 1</h4><div class="badge" id="previewHoney">-</div><small class="note">Termasuk faktor hasil Tahun 1 & mortaliti Tahun 1.</small></div>
+            <div class="mini-card"><h4>Anggaran botol (jika pembungkusan)</h4><div class="badge" id="previewBottles">-</div><small class="note">Berdasarkan saiz botol & hasil madu Tahun 1.</small></div>
+            <div class="mini-card"><h4>Kos tahunan Tahun 1 (RM)</h4><div class="badge" id="previewCost">-</div><small class="note">Kos asas + opsyen + kontinjensi.</small></div>
+          </div>
+        </div>
+      </details>
+
+      <div class="inline" style="margin-top:10px;">
+        <button class="btn-secondary btn-inline btn-next" data-next-step="step3">Seterusnya (Langkah 3)</button>
+      </div>
     </div>
-    <div class="note" id="statusMessage"></div>
-    <p class="note">Auto-simpan akan berlaku secara tertunda (beberapa saat) setiap kali anda ubah nilai. Simpanan disimpan di pelayar (localStorage).</p>
-  </div>
+  </details>
 
-  <div id="results" class="summary"></div>
+  <details class="step" id="step3">
+    <summary>Langkah 3: Analisis & Keputusan</summary>
+    <div class="step-card">
+      <details class="section" id="secG">
+        <summary id="sectionG">G. Parameter Analisis & Tindakan</summary>
+        <div class="section-body">
+          <label>Kadar Diskaun (% setahun):
+            <input id="discountRate" type="number" min="0" step="0.1" value="3">
+            <small class="hint">Jika tidak pasti, boleh guna 3% – 8% bergantung kos modal.</small>
+          </label>
+          <div class="error-text" id="err-discountRate"></div>
+          <label>Tempoh Analisis (tahun ekonomi projek):
+            <input id="duration" type="number" min="1" step="1" value="7">
+          </label>
+          <div class="error-text" id="err-duration"></div>
 
-  <!-- H. Graf Visual -->
-  <div class="section-title" id="sectionH">H. Graf Visual</div>
-  <p class="note">Graf membantu melihat aliran tunai, bila projek pulang modal dan kesan perubahan harga madu.</p>
-  <canvas id="cfChart" height="180"></canvas>
-  <canvas id="cumCfChart" height="180"></canvas>
-  <canvas id="npvSensChart" height="180"></canvas>
-  <canvas id="tornadoChart" height="200"></canvas>
+          <label>Kontinjensi (% atas kos tahunan):
+            <input id="contingencyPercent" type="number" min="0" max="100" step="0.5" value="10">
+          </label>
 
-  <div style="margin-top:16px;" class="inline">
-    <button class="btn-secondary" onclick="downloadPDF()">📄 Muat Turun PDF Ringkas (Screenshot)</button>
-    <button class="btn-secondary" onclick="downloadProfessionalPDF()">📄 Muat Turun PDF Profesional (Lengkap)</button>
-    <button class="btn-ghost" onclick="downloadCashflowCSV()">⬇️ Muat Turun CSV – Aliran Tunai</button>
-    <button class="btn-ghost" onclick="downloadSensitivityCSV()">⬇️ Muat Turun CSV – Sensitiviti</button>
-  </div>
+          <label>Kenaikan kos tahunan (inflasi kos) %:
+            <input id="costEscalationPercent" type="number" min="0" step="0.1" value="0">
+          </label>
+          <label>Kenaikan harga madu tahunan (inflasi harga) %:
+            <input id="priceEscalationPercent" type="number" min="0" step="0.1" value="0">
+          </label>
 
+          <div id="errorSummary" class="error-summary">Sila betulkan medan yang merah.</div>
+
+          <div class="inline" style="margin-top:8px; gap:8px; flex-wrap: wrap;">
+            <button class="btn-primary btn-inline" id="btnRun">Kira Analisis</button>
+            <button class="btn-secondary btn-inline" id="btnReset">Reset / Kosongkan</button>
+            <button class="btn-ghost btn-inline" id="btnDemo">Isi Contoh (Demo)</button>
+            <button class="btn-ghost btn-inline" id="btnSave">Simpan</button>
+            <button class="btn-secondary btn-inline" id="btnClearSave">Padam Simpanan</button>
+          </div>
+          <div class="note" id="statusMessage"></div>
+          <p class="note">Auto-simpan akan berlaku secara tertunda (beberapa saat) setiap kali anda ubah nilai. Simpanan disimpan di pelayar (localStorage).</p>
+        </div>
+      </details>
+
+      <details class="section" id="secResults">
+        <summary>Keputusan & Ringkasan</summary>
+        <div class="section-body">
+          <div id="results" class="summary"></div>
+        </div>
+      </details>
+
+      <details class="section" id="secH">
+        <summary id="sectionH">H. Graf Visual</summary>
+        <div class="section-body">
+          <p class="note">Graf membantu melihat aliran tunai, bila projek pulang modal dan kesan perubahan harga madu.</p>
+          <canvas id="cfChart" height="180"></canvas>
+          <canvas id="cumCfChart" height="180"></canvas>
+          <canvas id="npvSensChart" height="180"></canvas>
+          <canvas id="tornadoChart" height="200"></canvas>
+
+          <div style="margin-top:16px;" class="inline">
+            <button class="btn-secondary" onclick="downloadPDF()">📄 Muat Turun PDF Ringkas (Screenshot)</button>
+            <button class="btn-secondary" onclick="downloadProfessionalPDF()">📄 Muat Turun PDF Profesional (Lengkap)</button>
+            <button class="btn-ghost" onclick="downloadCashflowCSV()">⬇️ Muat Turun CSV – Aliran Tunai</button>
+            <button class="btn-ghost" onclick="downloadSensitivityCSV()">⬇️ Muat Turun CSV – Sensitiviti</button>
+          </div>
+        </div>
+      </details>
+    </div>
+  </details>
   <div class="disclaimer">
     <p class="note" style="font-size:10px; color:#bbbbbb; line-height:1.4;">
       <strong>Penafian (Disclaimer) – Bahasa Melayu:</strong><br>
@@ -1546,6 +1604,11 @@
     renderCharts(baseScenario, sensLabels, sensNPV);
     renderTornadoChart(multiSensitivity.chartData);
 
+    const step3 = document.getElementById('step3');
+    const resultsSection = document.getElementById('secResults');
+    if (step3) step3.open = true;
+    if (resultsSection) resultsSection.open = true;
+
     resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     const now = new Date();
@@ -1801,6 +1864,41 @@
     pdf.save('Laporan_Projek_Madu_Kelulut_profesional.pdf');
   }
 
+  function setupAccordion() {
+    const steps = Array.from(document.querySelectorAll('.step'));
+    steps.forEach(step => {
+      step.addEventListener('toggle', () => {
+        if (!step.open) return;
+        steps.forEach(other => {
+          if (other !== step) other.open = false;
+        });
+      });
+
+      const sections = Array.from(step.querySelectorAll('.section'));
+      sections.forEach(section => {
+        section.addEventListener('toggle', () => {
+          if (!section.open) return;
+          sections.forEach(other => {
+            if (other !== section) other.open = false;
+          });
+        });
+      });
+    });
+
+    document.querySelectorAll('.btn-next').forEach(button => {
+      button.addEventListener('click', () => {
+        const nextId = button.getAttribute('data-next-step');
+        const currentStep = button.closest('.step');
+        const nextStep = nextId ? document.getElementById(nextId) : null;
+        if (currentStep) currentStep.open = false;
+        if (nextStep) {
+          nextStep.open = true;
+          nextStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  }
+
   function setupListeners() {
     document.getElementById('btnRun').addEventListener('click', runAnalysis);
     document.getElementById('btnReset').addEventListener('click', () => { applyDefaults(); clearResults(); saveState(); updateColonyEstimate(); setStatusMessage('Semua medan telah direset ke nilai asal.'); });
@@ -1837,6 +1935,7 @@
     updateColonyEstimate();
     clearErrors();
     setupListeners();
+    setupAccordion();
     updateQuickPreview();
   };
 </script>
