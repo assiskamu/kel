@@ -191,6 +191,35 @@
     .req-badge { background: #ffeb3b; color: #2b2b2b; font-size: 10px; font-weight: bold; padding: 1px 6px; border-radius: 999px; margin-left: 6px; border: 1px solid #ffd600; letter-spacing: 0.4px; }
     .req-input { background: #fff7b0; border: 1px solid #ffd400; box-shadow: 0 0 6px rgba(255, 214, 0, 0.45); color: #1e1e1e; }
     .req-input::placeholder { color: #6b5a00; }
+    .guide-link { text-align: center; margin-top: 6px; font-size: 12px; }
+    .guide-link a { color: var(--amber); text-decoration: none; border-bottom: 1px dashed rgba(255, 213, 79, 0.6); }
+    .guide-link a:hover { color: #fff3c0; }
+    .guide-section { background: rgba(17, 17, 17, 0.9); border: 1px solid rgba(255, 202, 40, 0.25); padding: 14px; border-radius: 16px; margin: 14px 0 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.35); }
+    .guide-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .guide-title { font-size: 18px; margin: 0; color: var(--amber); letter-spacing: 0.3px; }
+    .guide-subtext { margin: 4px 0 0; color: #d6d6d6; font-size: 13px; }
+    .guide-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+    .guide-card { position: relative; padding: 14px 16px; border-radius: 16px; background: #151515; border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 6px 16px rgba(0,0,0,0.35); min-height: 180px; }
+    .guide-card:not(:last-child)::after { content: "→"; position: absolute; right: -16px; top: 50%; transform: translateY(-50%); font-size: 22px; color: rgba(255, 255, 255, 0.45); }
+    .guide-card .guide-number { font-size: 32px; font-weight: bold; margin-bottom: 6px; }
+    .guide-card .guide-icon { font-size: 24px; margin-bottom: 6px; }
+    .guide-card h4 { margin: 0 0 8px; font-size: 15px; letter-spacing: 0.3px; }
+    .guide-card ul { margin: 0; padding-left: 18px; font-size: 12px; color: #dcdcdc; line-height: 1.5; }
+    .guide-card.step-one { border-color: rgba(255, 202, 40, 0.5); box-shadow: 0 0 0 1px rgba(255, 202, 40, 0.2), 0 6px 16px rgba(0,0,0,0.35); }
+    .guide-card.step-one .guide-number { color: #ffd54f; }
+    .guide-card.step-one h4 { color: #ffe082; }
+    .guide-card.step-two { border-color: rgba(100, 181, 246, 0.6); box-shadow: 0 0 0 1px rgba(100, 181, 246, 0.2), 0 6px 16px rgba(0,0,0,0.35); }
+    .guide-card.step-two .guide-number { color: #90caf9; }
+    .guide-card.step-two h4 { color: #bbdefb; }
+    .guide-card.step-three { border-color: rgba(129, 199, 132, 0.6); box-shadow: 0 0 0 1px rgba(129, 199, 132, 0.2), 0 6px 16px rgba(0,0,0,0.35); }
+    .guide-card.step-three .guide-number { color: #a5d6a7; }
+    .guide-card.step-three h4 { color: #c8e6c9; }
+    .guide-tip { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.06); border: 1px dashed rgba(255, 255, 255, 0.2); font-size: 12px; color: #f0f0f0; }
+    .guide-tip strong { color: #ffe082; }
+    @media (max-width: 780px) {
+      .guide-cards { grid-template-columns: 1fr; }
+      .guide-card:not(:last-child)::after { content: "↓"; right: 50%; top: auto; bottom: -18px; transform: translateX(50%); }
+    }
     @media (max-width: 600px) { button { width: 100%; } .inline { flex-direction: column; align-items: flex-start; } }
   </style>
 </head>
@@ -198,6 +227,9 @@
 <div class="container" id="reportArea">
   <h1>KALKULATOR PROJEK MADU KELULUT</h1>
   <h2>Analisis Kewangan</h2>
+  <div class="guide-link" id="guideLink" style="display:none;">
+    <a href="#" id="showGuideLink">Tunjuk panduan</a>
+  </div>
   <div class="meta" id="reportMeta">Versi kalkulator: v2.1</div>
 
   <p class="note">
@@ -206,6 +238,49 @@
   <p class="note">
     <strong>Arahan:</strong> Ikuti <strong>Langkah 1 hingga 3</strong>. Pilih <strong>Mod Ringkas</strong> jika mahu isi bilangan koloni terus atau <strong>Mod Terperinci</strong> jika mahu berdasarkan keluasan & kepadatan. Tekan <strong>"Kira Analisis"</strong> untuk lihat NPV, IRR, BCR, ROI, graf dan PDF.
   </p>
+
+  <section class="guide-section" id="guideSection">
+    <div class="guide-header">
+      <div>
+        <h3 class="guide-title">Cara Guna Kalkulator (3 Langkah)</h3>
+        <p class="guide-subtext">Ikut langkah di bawah, kemudian tekan ‘Kira Analisis’ di Langkah 3.</p>
+      </div>
+      <button class="btn-ghost btn-inline" id="hideGuideBtn" type="button">Sembunyikan panduan</button>
+    </div>
+    <div class="guide-cards">
+      <div class="guide-card step-one">
+        <div class="guide-number">①</div>
+        <div class="guide-icon">🐝</div>
+        <h4>Isi Maklumat & Hasil</h4>
+        <ul>
+          <li>Bilangan koloni / keluasan</li>
+          <li>Hasil madu per koloni</li>
+          <li>Harga madu (RM/kg)</li>
+        </ul>
+      </div>
+      <div class="guide-card step-two">
+        <div class="guide-number">②</div>
+        <div class="guide-icon">💰</div>
+        <h4>Isi Kos</h4>
+        <ul>
+          <li>Modal awal (Tahun 0)</li>
+          <li>Belanja setahun (input, upah, sewa)</li>
+          <li>Lain-lain (sekali / setahun) jika ada</li>
+        </ul>
+      </div>
+      <div class="guide-card step-three">
+        <div class="guide-number">③</div>
+        <div class="guide-icon">📄</div>
+        <h4>Semak Keputusan & PDF</h4>
+        <ul>
+          <li>Untung Tahun 1, Payback, Break-even</li>
+          <li>NPV/IRR/BCR + jadual & graf</li>
+          <li>Muat turun PDF ringkas/profesional</li>
+        </ul>
+      </div>
+    </div>
+    <div class="guide-tip"><strong>Tip:</strong> Jika tak pasti nilai sebenar, isi anggaran dahulu. Anda boleh ubah kemudian dan tekan ‘Kira’ semula.</div>
+  </section>
 
   <details class="step" id="step1" data-step="1">
     <summary><span class="step-badge step-1">Langkah 1</span> Maklumat ladang & hasil (Bahagian A, B, B2)</summary>
@@ -2197,6 +2272,37 @@
     });
   }
 
+  function setGuideVisibility(show) {
+    const guide = document.getElementById('guideSection');
+    const link = document.getElementById('guideLink');
+    if (!guide || !link) return;
+    guide.style.display = show ? 'block' : 'none';
+    link.style.display = show ? 'none' : 'block';
+    if (show) {
+      localStorage.removeItem('kelulut_hide_guide');
+    } else {
+      localStorage.setItem('kelulut_hide_guide', '1');
+    }
+  }
+
+  function setupGuideToggle() {
+    const hideBtn = document.getElementById('hideGuideBtn');
+    const showLink = document.getElementById('showGuideLink');
+    if (hideBtn) {
+      hideBtn.addEventListener('click', () => setGuideVisibility(false));
+    }
+    if (showLink) {
+      showLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        setGuideVisibility(true);
+        const guide = document.getElementById('guideSection');
+        if (guide) guide.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+    const isHidden = localStorage.getItem('kelulut_hide_guide') === '1';
+    setGuideVisibility(!isHidden);
+  }
+
   function setupListeners() {
     document.getElementById('btnRun').addEventListener('click', runAnalysis);
     document.getElementById('btnReset').addEventListener('click', () => { applyDefaults(); clearResults(); saveState(); updateColonyEstimate(); setStatusMessage('Semua medan telah direset ke nilai asal.'); });
@@ -2234,6 +2340,7 @@
     clearErrors();
     setupListeners();
     setupAccordion();
+    setupGuideToggle();
     updateQuickPreview();
   };
 </script>
